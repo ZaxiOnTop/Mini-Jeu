@@ -3,93 +3,190 @@
   <head>
     <style>
       body {
-        background-color: black;
-        margin: 0;
-        overflow: hidden;
+          background-color: black;
+          background-image: url(/Image/night-sky-with-stars-sparkling-black-background_987686-453.avif); /* Remplace par le chemin de ton image */
+           background-size: cover; /* Couvre tout l'écran */
+          background-repeat: no-repeat; /* Pas de répétition de l'image */
+          margin: 0;
+          overflow: hidden;
       }
-
+    
       #spaceship {
-        width: 50px;
-        height: 50px;
-        background-color: blue;
-        position: absolute;
-        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+          width: 50px;
+          height: 50px;
+          position: absolute;
+          bottom: 0;
       }
 
+      #spaceship img {
+    width: 145%;
+    height: 145%;
+    object-fit: cover;
+    display: block; /* Assurez-vous que l'image est bien en mode bloc pour éviter l'invisibilité */
+}
+    
       .enemy {
-        width: 50px;
-        height: 50px;
-        background-color: red;
-        position: absolute;
-        top: 0;
+          width: 50px;
+          height: 50px;
+          position: absolute;
+          top: 0;
       }
-
+    
       .big-enemy {
-        width: 100px;
-        height: 100px;
-        background-color: orange;
-        position: absolute;
-        top: 0;
+          width: 100px;
+          height: 100px;
+          position: absolute;
+          top: 0;
       }
-
+    
       .laser {
-        width: 5px;
-        height: 20px;
-        background-color: yellow;
-        position: absolute;
+          width: 5px;
+          height: 20px;
+          background-color: yellow;
+          position: absolute;
       }
-
+    
       .big-enemy-laser {
-        width: 5px;
-        height: 20px;
-        background-color: orange;
-        position: absolute;
+          width: 5px;
+          height: 20px;
+          background-color: orange;
+          position: absolute;
       }
-
+    
       #score {
-        color: white;
-        font-size: 24px;
-        position: absolute;
-        top: 10px;
-        left: 10px;
+          color: white;
+          font-size: 24px;
+          position: absolute;
+          top: 10px; /* Positionne le score en haut à gauche */
+          left: 10px;
+          z-index: 100;
       }
-
+    
+      #best-score {
+          color: white;
+          font-size: 24px;
+          position: absolute;
+          top: 40px; /* Positionne le meilleur score sous le score */
+          left: 10px;
+          z-index: 100;
+      }
+    
       #timer {
-        color: white;
-        font-size: 24px;
-        position: absolute;
-        top: 10px;
-        right: 10px;
+          color: white;
+          font-size: 24px;
+          position: absolute;
+          top: 10px; /* Positionne le timer en haut à droite */
+          right: 10px;
+          z-index: 100;
+      }
+    
+      #boss-life {
+          display: none;
+          color: white;
+          font-size: 24px;
+          position: absolute;
+          top: 70px;
+          left: 10px;
+      }
+    
+      /* Popup styling */
+      #pause-popup {
+          display: none;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: white;
+          color: black;
+          padding: 20px;
+          text-align: center;
+          border-radius: 10px;
+          z-index: 1000;
+      }
+    
+      #pause-popup button {
+          margin: 5px;
+          padding: 10px 20px;
+          font-size: 16px;
       }
 
-      #boss-life {
-        display: none; /* Caché initialement */
-        color: white;
-        font-size: 24px;
-        position: absolute;
-        top: 50px;
-        left: 10px;
+
+      /* Popup styling */
+      #end-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            color: black;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        #end-popup button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    
+      /* Dark overlay behind popup */
+      #overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5);
+          z-index: 999;
       }
     </style>
+    
   </head>
   <body>
-    <div id="spaceship"></div>
-    <div class="enemy" id="enemy1"></div>
-    <div class="enemy" id="enemy2"></div>
-    <div class="enemy" id="enemy3"></div>
+    <div id="spaceship"> <img src="/Image/Spaceship-removebg-preview.png" alt=""></div>
+    
     <div id="score">Score: 0</div>
+    <div id="best-score">Best Score: 0</div>
     <div id="timer">Time: 0s</div>
     <div id="boss-life">Boss Life: 100%</div>
 
+    <!-- Popup HTML -->
+    <div id="overlay"></div>
+    <div id="pause-popup">
+      <p>Game Paused</p>
+      <button id="resume-button">Resume</button>
+      <button id="restart-button">Restart</button>
+    </div>
+
+     <!-- Popup de fin de jeu -->
+     <div id="end-popup">
+      <p id="end-message"></p>
+      <button id="newgame-button">New game</button>
+  </div>
+
     <script>
       const spaceship = document.getElementById('spaceship');
+      let bestScore = localStorage.getItem('bestScore') || 0; // Récupérer le bestScore depuis le stockage local
       const spaceshipWidth = spaceship.clientWidth;
       const screenWidth = window.innerWidth;
       let score = 0;
       let time = 0;
-      let bossLife = 100; // Vie initiale du boss (100%)
+      let bossLife = 100;
       let timerInterval;
+      let gamePaused = false;
+
       const bossLifeElement = document.getElementById('boss-life');
+      const overlay = document.getElementById('overlay');
+      const pausePopup = document.getElementById('pause-popup');
+      const resumeButton = document.getElementById('resume-button');
+      const restartButton = document.getElementById('restart-button');
 
       let spaceshipX = screenWidth / 2 - spaceshipWidth / 2;
       let isMovingLeft = false;
@@ -99,39 +196,64 @@
       const enemy2 = document.getElementById('enemy2');
       const enemy3 = document.getElementById('enemy3');
 
-      const enemies = [enemy1, enemy2, enemy3];
+      const enemies = []; // Tableau vide pour les ennemis
+
+function spawnInitialEnemies() {
+  for (let i = 0; i < 3; i++) { // Crée 3 ennemis
+    const newEnemy = document.createElement('div');
+    newEnemy.className = 'enemy';
+    newEnemy.style.left = Math.random() * (window.innerWidth - 50) + 'px'; // Position aléatoire
+    newEnemy.style.top = '0px'; // Position en haut de l'écran
+
+    const enemyImage = document.createElement('img');
+        enemyImage.src = '/Image/modele-autocollant-objet-volant-non-identifie-ovni-isole_1308-57963-removebg-preview.png'; // Chemin vers l'image de l'ennemi
+        enemyImage.style.width = '100%'; // S'assure que l'image remplit le div
+        enemyImage.style.height = '100%'; // S'assure que l'image remplit le div
+        enemyImage.alt = 'Enemy'; // Ajoute un texte alternatif pour l'accessibilité
+
+        newEnemy.appendChild(enemyImage); // Ajoute l'image au div de l'ennemi
+    document.body.appendChild(newEnemy);
+    enemies.push(newEnemy); // Ajoute l'ennemi au tableau
+  }
+}
+
+// Appelle la fonction pour spawn les ennemis au démarrage
+spawnInitialEnemies();
       const enemySpeed = 1.5;
       const laserSpeed = 5;
-      const bigEnemyLaserSpeed = 2; // Réduction de 25% de la vitesse
+      const bigEnemyLaserSpeed = 1.5;
 
       let bigEnemyShootCooldown = 0;
 
       function moveEnemies() {
-        enemies.forEach((enemy) => {
-          let currentTop = parseInt(enemy.style.top, 10) || 0;
-          enemy.style.top = currentTop + enemySpeed + 'px';
+        if (!gamePaused) {
+          enemies.forEach((enemy) => {
+            let currentTop = parseInt(enemy.style.top, 10) || 0;
+            enemy.style.top = currentTop + enemySpeed + 'px';
 
-          if (currentTop >= window.innerHeight) {
-            enemy.style.top = '0px';
-            enemy.style.left = Math.random() * (window.innerWidth - 50) + 'px';
-          }
-        });
-
+            if (currentTop >= window.innerHeight) {
+              enemy.style.top = '0px';
+              enemy.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+            }
+          });
+        }
         requestAnimationFrame(moveEnemies);
       }
 
       function updateSpaceshipPosition() {
-        if (isMovingLeft) {
-          spaceshipX -= 5;
-        }
-        if (isMovingRight) {
-          spaceshipX += 5;
-        }
+        if (!gamePaused) {
+          if (isMovingLeft) {
+            spaceshipX -= 5;
+          }
+          if (isMovingRight) {
+            spaceshipX += 5;
+          }
 
-        spaceshipX = Math.max(0, spaceshipX);
-        spaceshipX = Math.min(screenWidth - spaceshipWidth, spaceshipX);
+          spaceshipX = Math.max(0, spaceshipX);
+          spaceshipX = Math.min(screenWidth - spaceshipWidth, spaceshipX);
 
-        spaceship.style.left = spaceshipX + 'px';
+          spaceship.style.left = spaceshipX + 'px';
+        }
 
         requestAnimationFrame(updateSpaceshipPosition);
       }
@@ -144,6 +266,11 @@
         document.body.appendChild(laser);
 
         function moveLaser() {
+          if (gamePaused) {
+            requestAnimationFrame(moveLaser); // Laisser figé en pause
+            return;
+          }
+
           let currentTop = parseInt(laser.style.top, 10) || 0;
           laser.style.top = currentTop - laserSpeed + 'px';
 
@@ -168,12 +295,12 @@
             const bigEnemy = document.querySelector('.big-enemy');
             if (bigEnemy && isColliding(laser, bigEnemy)) {
               document.body.removeChild(laser);
-              bossLife -= 10; // Réduit la vie du boss de 10%
+              bossLife -= 10;
               updateBossLife();
 
-              if (bossLife <= 0) { // Vérifie si la vie du boss est épuisée
-                alert('Congratulations! You Win! Your Score: ' + score);
-                location.reload();
+              if (bossLife <= 0) {
+                endGame('Congratulations! You Win! Your Score: ' + score);
+                
               }
             }
 
@@ -201,99 +328,189 @@
           newEnemy.className = 'enemy';
           newEnemy.style.left = Math.random() * (window.innerWidth - 50) + 'px';
           newEnemy.style.top = '0px';
+
+          const enemyImage = document.createElement('img');
+        enemyImage.src = '/Image/modele-autocollant-objet-volant-non-identifie-ovni-isole_1308-57963-removebg-preview.png'; // Chemin vers l'image de l'ennemi
+        enemyImage.style.width = '100%'; // S'assure que l'image remplit le div
+        enemyImage.style.height = '100%'; // S'assure que l'image remplit le div
+        enemyImage.alt = 'Enemy'; // Ajoute un texte alternatif pour l'accessibilité
+
+        newEnemy.appendChild(enemyImage); // Ajoute l'image au div de l'ennemi
           document.body.appendChild(newEnemy);
           enemies[index] = newEnemy;
         }
       }
 
+      
+
       function spawnBigEnemy() {
         if (score === 20) {
-          bossLife = 100; // Réinitialise la vie du boss
-          bossLifeElement.style.display = 'block'; // Affiche le compteur de la vie du boss
+          bossLife = 100;
+          bossLifeElement.style.display = 'block';
 
           const bigEnemy = document.createElement('div');
           bigEnemy.className = 'big-enemy';
           bigEnemy.style.left = Math.random() * (window.innerWidth - 100) + 'px';
           bigEnemy.style.top = '0px';
+
+          const bigEnemyImage = document.createElement('img');
+        bigEnemyImage.src = '/Image/sticker-png-massive-pixel-starship-removebg-preview.png'; // Chemin vers l'image du gros ennemi
+        bigEnemyImage.style.width = '100%'; // S'assure que l'image remplit le div
+        bigEnemyImage.style.height = '100%'; // S'assure que l'image remplit le div
+        bigEnemyImage.alt = 'Big Enemy'; // Ajoute un texte alternatif pour l'accessibilité
+
+        bigEnemy.appendChild(bigEnemyImage); // Ajoute l'image au div du gros ennemi
           document.body.appendChild(bigEnemy);
 
           let bigEnemyX = parseFloat(bigEnemy.style.left);
           let direction = 1;
 
           function moveBigEnemy() {
-            bigEnemyX += direction * enemySpeed;
-            bigEnemy.style.left = bigEnemyX + 'px';
+            if (!gamePaused) {
+              // Changement de direction amélioré
+              if (Math.random() < 0.01) { // 1% de chance à chaque frame
+                direction *= -1;
+              }
+              bigEnemyX += direction * 2;
 
-            if (bigEnemyX <= 0 || bigEnemyX + 100 >= screenWidth) {
-              direction *= -1;
-            }
+              // Vérifie les limites de l'écran
+              if (bigEnemyX <= 0 || bigEnemyX >= window.innerWidth - 100) {
+                direction *= -1; // Change de direction si atteint les bords
+                bigEnemyX = Math.max(0, Math.min(bigEnemyX, window.innerWidth - 100)); // Reste dans les limites
+              }
 
-            if (bigEnemyShootCooldown <= 0) {
-              createBigEnemyLaser(bigEnemyX + 50, 100);
-              bigEnemyShootCooldown = 100;
-            } else {
-              bigEnemyShootCooldown--;
+              bigEnemy.style.left = bigEnemyX + 'px';
             }
 
             requestAnimationFrame(moveBigEnemy);
           }
 
-          requestAnimationFrame(moveBigEnemy);
+          moveBigEnemy();
+
+          setInterval(() => {
+            if (Math.random() < 0.7 && !gamePaused) { // 70% de chance de tirer
+              createBigEnemyLaser(bigEnemyX + 50, 100);
+            }
+          }, 1000); // Tir toutes les 1 secondes
         }
       }
 
       function createBigEnemyLaser(x, y) {
-        const laser = document.createElement('div');
-        laser.className = 'big-enemy-laser';
-        laser.style.left = x + 'px';
-        laser.style.top = y + 'px';
-        document.body.appendChild(laser);
+    const laser = document.createElement('div');
+    laser.className = 'big-enemy-laser';
+    laser.style.left = x + 'px';
+    laser.style.top = y + 'px';
+    document.body.appendChild(laser);
 
-        function moveLaser() {
-          let currentTop = parseInt(laser.style.top, 10) || 0;
-          laser.style.top = currentTop + bigEnemyLaserSpeed + 'px';
-
-          if (currentTop >= window.innerHeight) {
-            document.body.removeChild(laser);
-          }
-
-          if (isColliding(laser, spaceship)) {
-            alert('Game Over! Your Score: ' + score);
-            location.reload();
-          }
-
-          requestAnimationFrame(moveLaser);
+    function moveLaser() {
+        if (gamePaused) {
+            requestAnimationFrame(moveLaser); // Pause si le jeu est en pause
+            return;
         }
 
-        requestAnimationFrame(moveLaser);
-      }
+        let currentTop = parseInt(laser.style.top, 10) || 0;
+        laser.style.top = currentTop + bigEnemyLaserSpeed + 'px';
+
+        if (currentTop >= window.innerHeight) {
+            document.body.removeChild(laser);
+        } else if (isColliding(laser, spaceship)) {
+            endGame('Game Over! Your Score: ' + score); // Appelez endGame ici
+        } else {
+            requestAnimationFrame(moveLaser);
+        }
+    }
+
+    requestAnimationFrame(moveLaser);
+}
+
+
+      document.getElementById('best-score').textContent = 'Best Score: ' + bestScore;
+
+
+      function endGame(message) {
+            clearInterval(timerInterval);
+            gamePaused = true;
+            overlay.style.display = 'block';
+            document.getElementById('end-popup').style.display = 'block'; // Utiliser l'identifiant correct
+            document.getElementById('end-message').innerText = message; // Utiliser l'identifiant correct
+
+            // Mettre à jour le meilleur score
+            if (score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('bestScore', bestScore);
+                document.getElementById('best-score').innerText = 'Best Score: ' + bestScore;
+            }
+        }
 
       function updateScore() {
-        const scoreElement = document.getElementById('score');
-        scoreElement.textContent = 'Score: ' + score;
+        document.getElementById('score').textContent = 'Score: ' + score;
+      
+
+      if (score > bestScore) {
+          bestScore = score;
+          document.getElementById('best-score').textContent = 'Best Score: ' + bestScore;
+          localStorage.setItem('bestScore', bestScore); // Stocker le nouveau bestScore
+        }
       }
+      
+
+        function onEnemyDestroyed() {
+        updateScore(); // Appel à la mise à jour du score et du best score
+      }
+
 
       function updateBossLife() {
         bossLifeElement.textContent = 'Boss Life: ' + bossLife + '%';
       }
 
       function updateTimer() {
-        const timerElement = document.getElementById('timer');
-        timerElement.textContent = 'Time: ' + time + 's';
-        time++;
+        if (!gamePaused) {
+          const timerElement = document.getElementById('timer');
+          timerElement.textContent = 'Time: ' + time + 's';
+          time++;
+        }
       }
+
+
+      function restartGame() {
+            score = 0;
+            time = 0;
+            bossLife = 100;
+            enemies.length = 0; // Réinitialiser le tableau des ennemis
+            gamePaused = false;
+
+            // Masquer la pop-up et l'overlay
+            overlay.style.display = 'none';
+            endPopup.style.display = 'none';
+
+            // Réinitialiser les éléments du jeu
+            document.querySelectorAll('.enemy').forEach(enemy => enemy.remove());
+            document.querySelectorAll('.big-enemy').forEach(enemy => enemy.remove());
+            document.querySelectorAll('.laser').forEach(laser => laser.remove());
+
+            spawnInitialEnemies();
+            updateScore();
+            updateBossLife();
+            startTimer();
+        }
+  
 
       timerInterval = setInterval(updateTimer, 1000);
 
       window.addEventListener('keydown', (event) => {
-        if (event.key === 'ArrowLeft') {
-          isMovingLeft = true;
+        if (event.key === 'Escape') {
+          togglePause();
         }
-        if (event.key === 'ArrowRight') {
-          isMovingRight = true;
-        }
-        if (event.key === ' ') {
-          createLaser(spaceshipX + spaceshipWidth / 2, window.innerHeight - 50);
+        if (!gamePaused) {
+          if (event.key === 'ArrowLeft') {
+            isMovingLeft = true;
+          }
+          if (event.key === 'ArrowRight') {
+            isMovingRight = true;
+          }
+          if (event.key === ' ') {
+            createLaser(spaceshipX + spaceshipWidth / 2, window.innerHeight - 50);
+          }
         }
       });
 
@@ -306,9 +523,27 @@
         }
       });
 
+      function togglePause() {
+        gamePaused = !gamePaused;
+        overlay.style.display = gamePaused ? 'block' : 'none';
+        pausePopup.style.display = gamePaused ? 'block' : 'none';
+      }
+
+      resumeButton.addEventListener('click', () => {
+        togglePause();
+      });
+
+      restartButton.addEventListener('click', () => {
+    location.reload(); 
+});
+
+document.getElementById('newgame-button').addEventListener('click', () => {
+  location.reload();
+});
+
       moveEnemies();
       updateSpaceshipPosition();
       updateScore();
     </script>
   </body>
-</html>
+</html> 
