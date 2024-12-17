@@ -34,6 +34,23 @@
           position: absolute;
           top: 0;
       }
+
+      @keyframes enemy-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+.enemy {
+  animation: enemy-shake 0.8s infinite; /* Les ennemis tremblent en permanence */
+}
+
     
       .big-enemy {
           width: 100px;
@@ -146,6 +163,36 @@
           background-color: rgba(0, 0, 0, 0.5);
           z-index: 999;
       }
+
+      @keyframes laser-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px yellow;
+  }
+  50% {
+    box-shadow: 0 0 15px yellow;
+  }
+}
+
+.laser {
+  animation: laser-glow 0.5s infinite;
+}
+
+@keyframes spaceship-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: brightness(1.5);
+  }
+}
+
+#spaceship img {
+  animation: spaceship-pulse 1.5s infinite;
+}
+
+
     </style>
     
   </head>
