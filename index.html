@@ -1329,11 +1329,11 @@
 
         // Configuration des types d'ennemis
         const ENEMY_TYPES = {
-            SCOUT: { hp: 1, speed: 1.0, fireRate: 0.005, score: 10, filter: 'none' },
-            INTERCEPTOR: { hp: 1, speed: 1.8, fireRate: 0.008, score: 25, filter: 'hue-rotate(120deg) brightness(1.2)', zigZag: true },
-            TANK: { hp: 5, speed: 0.6, fireRate: 0.012, score: 60, filter: 'hue-rotate(300deg) saturate(2)', size: 60 },
-            KAMIKAZE: { hp: 1, speed: 4.0, fireRate: 0, score: 30, filter: 'hue-rotate(45deg) saturate(3) contrast(1.5)', dash: true },
-            ASTEROID: { hp: 10, speed: 1.5, fireRate: 0, score: 5, filter: 'grayscale(1) brightness(0.7)', size: 80, isHazard: true }
+            SCOUT: { hp: 1, speed: 1.0, fireRate: 0.005, score: 10, filter: 'none', coins: 1 },
+            INTERCEPTOR: { hp: 1, speed: 1.8, fireRate: 0.008, score: 25, filter: 'hue-rotate(120deg) brightness(1.2)', zigZag: true, coins: 2 },
+            TANK: { hp: 5, speed: 0.6, fireRate: 0.012, score: 60, filter: 'hue-rotate(300deg) saturate(2)', size: 60, coins: 5 },
+            KAMIKAZE: { hp: 1, speed: 4.0, fireRate: 0, score: 30, filter: 'hue-rotate(45deg) saturate(3) contrast(1.5)', dash: true, coins: 3 },
+            ASTEROID: { hp: 10, speed: 1.5, fireRate: 0, score: 5, filter: 'grayscale(1) brightness(0.7)', size: 80, isHazard: true, coins: 10 }
         };
 
         function spawnEnemy(typeKey = 'SCOUT', customX = null, customY = -60) {
@@ -1758,9 +1758,10 @@
                             e.hp -= 14 * dt; // 14 damage per second (reduced by 30%)
                             if (e.hp <= 0) {
                                 createExplosion(e.x, e.y, '#ff0'); 
-                                addCoins(e.type === 'ASTEROID' ? 5 : 1);
+                                const val = ENEMY_TYPES[e.type]?.coins || 1;
+                                addCoins(val);
                                 e.el.remove(); enemies.splice(i, 1);
-                                addScore(10 * (e.type === 'SCOUT' ? 1 : 2)); 
+                                addScore(ENEMY_TYPES[e.type]?.score || 10); 
                                 state.enemiesKilledThisLevel++;
                                 scoreEl.textContent = 'SCORE: ' + state.score;
                             }
@@ -1943,9 +1944,11 @@
                         e.hp -= l.dmg;
                         if (e.hp <= 0) {
                             createExplosion(e.x, e.y, '#ff0');
-                            addCoins(e.type || 1);
+                            const val = ENEMY_TYPES[e.type]?.coins || 1;
+                            addCoins(val);
                             e.el.remove(); enemies.splice(j, 1);
-                            addScore(10 * (e.type || 1)); state.enemiesKilledThisLevel++;
+                            addScore(ENEMY_TYPES[e.type]?.score || 10); 
+                            state.enemiesKilledThisLevel++;
                             scoreEl.textContent = 'SCORE: ' + state.score;
 
                             // Gain energy on kill
