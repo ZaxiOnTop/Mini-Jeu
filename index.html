@@ -2110,6 +2110,20 @@
         startGameBtn.onclick = () => {
             const name = startNicknameInput.value.trim().toUpperCase() || "PILOT";
             localStorage.setItem('spaceInvadersNickname', name);
+            
+            // RESET COMPLET POUR UNE NOUVELLE RUN
+            state.level = 1;
+            state.score = 0;
+            state.coins = 0;
+            state._scoreCheck = 456;
+            state._coinsCheck = 789;
+            updateLevelCheck();
+            updateCoinsHud();
+            
+            // Reset des consommables (inventory)
+            inventory = { shield: 0, damage: 0, firerate: 0, homing: 0 };
+            updateInventoryHud();
+            
             startPopup.style.display = 'none';
             overlay.style.display = 'none';
             startLevelTransition();
