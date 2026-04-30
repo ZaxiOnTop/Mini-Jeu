@@ -920,9 +920,9 @@
             level: 1,
             enemiesKilledThisLevel: 0,
             score: 0,
-            _scoreCheck: 456, // Valeur de contrôle interne
+            _scoreCheck: 456,
             bestScore: parseInt(localStorage.getItem('spaceInvadersBestScore')) || 0,
-            coins: parseInt(localStorage.getItem('spaceInvadersCoins')) || 0,
+            coins: 0, // On commence toujours à 0
             time: 0,
             gameTimeMs: 0,
             isPaused: false,
@@ -953,6 +953,7 @@
         function addCoins(amount) {
             state.coins += amount;
             state._coinsCheck = state.coins * 456 + 789;
+            updateCoinsHud(); // Indispensable pour voir le changement !
             saveGameData();
         }
 
@@ -981,10 +982,7 @@
                 const expectedSig = btoa(unescape(encodeURIComponent(json + salt))).split('').reverse().join('X');
                 
                 if (sig === expectedSig) {
-                    state.coins = data.coins || 0;
                     state.bestScore = data.bestScore || 0;
-                    // On ne restaure PAS le niveau pour éviter de skip des boss, 
-                    // mais on vérifie la cohérence
                     upgrades = data.upgrades || upgrades;
                     inventory = data.inventory || inventory;
                 } else {
