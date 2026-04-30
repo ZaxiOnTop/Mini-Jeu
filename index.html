@@ -1330,13 +1330,13 @@
 
         // Configuration des types d'ennemis
         const ENEMY_TYPES = {
-            SCOUT: { hp: 1, speed: 0.7, fireRate: 0.005, score: 10, filter: 'none', coins: 1 },
-            INTERCEPTOR: { hp: 1, speed: 1.2, fireRate: 0.008, score: 25, filter: 'hue-rotate(120deg) brightness(1.2)', zigZag: true, coins: 2 },
-            TANK: { hp: 5, speed: 0.5, fireRate: 0.012, score: 60, filter: 'hue-rotate(300deg) saturate(2)', size: 60, coins: 5 }, 
-            KAMIKAZE: { hp: 1, speed: 3.2, fireRate: 0, score: 30, filter: 'hue-rotate(45deg) saturate(3) contrast(1.5)', dash: true, coins: 3 },
-            ASTEROID: { hp: 10, speed: 1.2, fireRate: 0, score: 5, filter: 'grayscale(1) brightness(0.7)', size: 80, isHazard: true, coins: 10 },
-            CARGO: { hp: 1, speed: 2.5, fireRate: 0, score: 100, filter: 'sepia(1) saturate(10) brightness(1.2)', horizontal: true, coins: 10, size: 50 },
-            SUPER_CARGO: { hp: 2, speed: 3.0, fireRate: 0, score: 500, filter: 'brightness(3) saturate(0) contrast(2)', horizontal: true, coins: 50, size: 65 }
+            SCOUT: { hp: 1, speed: 0.6, fireRate: 0.003, score: 10, filter: 'none', coins: 1 },
+            INTERCEPTOR: { hp: 1, speed: 0.85, fireRate: 0.004, score: 25, filter: 'hue-rotate(120deg) brightness(1.2)', zigZag: true, coins: 2 },
+            TANK: { hp: 5, speed: 0.45, fireRate: 0.008, score: 60, filter: 'hue-rotate(300deg) saturate(2)', size: 60, coins: 5 }, 
+            KAMIKAZE: { hp: 1, speed: 2.8, fireRate: 0, score: 30, filter: 'hue-rotate(45deg) saturate(3) contrast(1.5)', dash: true, coins: 3 },
+            ASTEROID: { hp: 10, speed: 1.0, fireRate: 0, score: 5, filter: 'grayscale(1) brightness(0.7)', size: 80, isHazard: true, coins: 10 },
+            CARGO: { hp: 1, speed: 2.2, fireRate: 0, score: 100, filter: 'sepia(1) saturate(10) brightness(1.2)', horizontal: true, coins: 10, size: 50 },
+            SUPER_CARGO: { hp: 2, speed: 2.8, fireRate: 0, score: 500, filter: 'brightness(3) saturate(0) contrast(2)', horizontal: true, coins: 50, size: 65 }
         };
 
         function spawnEnemy(typeKey = 'SCOUT', customX = null, customY = -60) {
@@ -1377,19 +1377,19 @@
                 type: typeKey,
                 hp: config.hp,
                 maxHp: config.hp,
-                speed: vy || Math.abs(vx),
+                speed: (95 + (state.level * 8)) * config.speed, // Vitesse réduite
                 width: size, height: size,
                 baseX: x,
                 zigZagOffset: Math.random() * Math.PI * 2,
-                fireRate: config.fireRate + (state.level * 0.001)
+                fireRate: config.fireRate + (state.level * 0.0005) // Tirs moins fréquents
             });
         }
 
         function spawnWave() {
             if (state.bossActive || state.transitioning) return;
             
-            // Limite d'ennemis pour éviter le chaos (5 + 2 par niveau)
-            const maxEnemies = 5 + (state.level * 2);
+            // Limite d'ennemis plus stricte (4 + 1.5 par niveau)
+            const maxEnemies = Math.floor(4 + (state.level * 1.5));
             if (enemies.length >= maxEnemies) return;
 
             const r = Math.random();
@@ -1845,8 +1845,8 @@
                 if (enemySpawnTimer > nextSpawnInterval) {
                     spawnWave(); 
                     enemySpawnTimer = 0; 
-                    // Intervalle plus long au début (2.5s) et descend moins vite
-                    nextSpawnInterval = Math.max(700, 2500 - (state.level * 150));
+                    // Intervalle encore plus long (3s au début)
+                    nextSpawnInterval = Math.max(800, 3000 - (state.level * 200));
                 }
             }
             // Powerups (On enlève le spawn aléatoire pour privilégier le Cargo)
