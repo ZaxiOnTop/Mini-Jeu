@@ -1356,8 +1356,8 @@
             TANK: { hp: 5, speed: 0.45, fireRate: 0.008, score: 60, filter: 'hue-rotate(300deg) saturate(2)', size: 60, coins: 5 }, 
             KAMIKAZE: { hp: 1, speed: 2.8, fireRate: 0, score: 30, filter: 'hue-rotate(45deg) saturate(3) contrast(1.5)', dash: true, coins: 3 },
             ASTEROID: { hp: 10, speed: 1.0, fireRate: 0, score: 5, filter: 'grayscale(1) brightness(0.7)', size: 80, isHazard: true, coins: 10 },
-            CARGO: { hp: 1, speed: 2.2, fireRate: 0, score: 100, filter: 'sepia(1) saturate(10) brightness(1.2)', horizontal: true, coins: 10, size: 50, img: 'Image/cargo.png' },
-            SUPER_CARGO: { hp: 2, speed: 2.8, fireRate: 0, score: 500, filter: 'brightness(3) saturate(0) contrast(2)', horizontal: true, coins: 50, size: 65, img: 'Image/cargo.png' }
+            CARGO: { hp: 1, speed: 2.2, fireRate: 0, score: 100, filter: 'sepia(1) saturate(10) brightness(1.2)', horizontal: true, coins: 10, size: 100, img: 'Image/cargo.png' },
+            SUPER_CARGO: { hp: 2, speed: 2.8, fireRate: 0, score: 500, filter: 'brightness(3) saturate(0) contrast(2)', horizontal: true, coins: 50, size: 130, img: 'Image/cargo.png' }
         };
 
         function spawnEnemy(typeKey = 'SCOUT', customX = null, customY = -60) {
@@ -1409,14 +1409,13 @@
         function spawnWave() {
             if (state.bossActive || state.transitioning) return;
             
-            // Limite d'ennemis plus stricte (4 + 1.5 par niveau)
             const maxEnemies = Math.floor(4 + (state.level * 1.5));
             if (enemies.length >= maxEnemies) return;
 
             const r = Math.random();
             const level = state.level;
 
-            // Sélection du type (plus progressif)
+            // 1. Sélection du type d'ennemi
             let type = 'SCOUT';
             if (level >= 3 && r > 0.7) type = 'INTERCEPTOR';
             if (level >= 5 && r > 0.85) type = 'TANK';
@@ -1424,20 +1423,32 @@
             if (level >= 4 && Math.random() < 0.05) type = 'ASTEROID';
             
             const cargoRoll = Math.random();
-            if (cargoRoll < 0.01) type = 'SUPER_CARGO'; // 1% Super Cargo
-            else if (cargoRoll < 0.06) type = 'CARGO'; // 5% Cargo Classique (0.01 + 0.05)
+            if (cargoRoll < 0.01) type = 'SUPER_CARGO'; 
+            else if (cargoRoll < 0.06) type = 'CARGO'; 
 
-            // Formations (Escadrilles)
-            const canSpawnFormation = level >= 2 && type !== 'TANK' && type !== 'ASTEROID' && type !== 'CARGO' && type !== 'SUPER_CARGO' && enemies.length < (maxEnemies - 3);
-            
-            if (Math.random() < 0.3 && canSpawnFormation) {
-                const count = level >= 5 ? 4 : 3; // Petites vagues au début
-                const startX = 150 + Math.random() * (window.innerWidth - 300);
-                for(let i=0; i<count; i++) {
-                    setTimeout(() => spawnEnemy(type, startX + (i * 60 - (count * 30)), -60 - (i * 30)), i * 200);
-                }
-            } else {
+            // 2. Sélection de la formation
+            const formationRoll = Math.random();
+            const centerX = 150 + Math.random() * (window.innerWidth - 300);
+            const gap = 70;
+
+            // Pas de formation pour les Cargos ou Astéroïdes
+            if (type === 'CARGO' || type === 'SUPER_CARGO' || type === 'ASTEROID' || type === 'TANK') {
                 spawnEnemy(type);
+                return;
+            }
+
+            if (level >= 2 && formationRoll > 0.7 && (enemies.length + 3) <= maxEnemies) {
+                // TRIANGLE
+                spawnEnemy(type, centerX, -60);
+                spawnEnemy(type, centerX - gap, -120);
+                spawnEnemy(type, centerX + gap, -120);
+            } else if (formationRoll > 0.4 && (enemies.length + 2) <= maxEnemies) {
+                // DUO
+                spawnEnemy(type, centerX - gap/2, -60);
+                spawnEnemy(type, centerX + gap/2, -60);
+            } else {
+                // SOLO
+                spawnEnemy(type, centerX, -60);
             }
         }
 
