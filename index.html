@@ -805,6 +805,23 @@
         <button id="shop-close-btn" onclick="closeShop()" style="margin-top: 20px;">BACK TO PAUSE</button>
     </div>
 
+    <div id="start-popup" class="popup" style="display: block; padding: 40px; width: 450px;">
+        <h1 style="color: #ffdf00; font-size: 40px; margin-bottom: 10px; text-shadow: 0 0 20px #ff0;">SPACE INVADERS</h1>
+        <p style="font-size: 14px; color: #0ff; margin-bottom: 30px; letter-spacing: 2px;">ARCADE EDITION</p>
+        
+        <div style="margin-bottom: 30px;">
+            <p style="font-size: 12px; color: #aaa; margin-bottom: 10px;">ENTER YOUR PILOT NAME</p>
+            <input type="text" id="start-nickname" placeholder="PILOT" maxlength="12" 
+                style="background: rgba(255,255,255,0.1); border: 2px solid #0ff; color: #fff; padding: 12px 20px; border-radius: 5px; font-family: 'Courier New', Courier, monospace; text-align: center; width: 200px; font-size: 18px; outline: none; box-shadow: 0 0 10px rgba(0,255,255,0.2);">
+        </div>
+
+        <button id="start-game-btn" style="padding: 15px 40px; font-size: 20px; background: #0ff; color: #000; font-weight: bold; border-radius: 5px; cursor: pointer;">START GAME</button>
+        
+        <div style="margin-top: 40px; font-size: 10px; color: #555;">
+            USE ARROWS TO MOVE • SPACE TO SHOOT • SHIFT FOR MEGA BEAM
+        </div>
+    </div>
+
     <div id="end-popup" class="popup" style="padding: 30px; width: 450px;">
         <p id="end-message" style="font-size: 32px; margin-bottom: 5px;"></p>
         <p id="end-score" style="font-size: 20px; color: #0ff; margin-bottom: 5px;"></p>
@@ -1825,7 +1842,24 @@
 
         window.addEventListener('resize', () => { player.y = window.innerHeight - 50; spaceship.style.bottom = '20px'; });
 
-        startLevelTransition();
+        // --- START GAME LOGIC ---
+        const startPopup = document.getElementById('start-popup');
+        const startNicknameInput = document.getElementById('start-nickname');
+        const startGameBtn = document.getElementById('start-game-btn');
+
+        // Pré-remplir le pseudo au démarrage
+        startNicknameInput.value = localStorage.getItem('spaceInvadersNickname') || "";
+
+        startGameBtn.onclick = () => {
+            const name = startNicknameInput.value.trim().toUpperCase() || "PILOT";
+            localStorage.setItem('spaceInvadersNickname', name);
+            startPopup.style.display = 'none';
+            overlay.style.display = 'none';
+            startLevelTransition();
+        };
+
+        // Supprimer l'appel automatique pour attendre le clic sur START
+        // startLevelTransition(); 
     </script>
 </body>
 
