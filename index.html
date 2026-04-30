@@ -859,23 +859,32 @@
     </div>
 
     <div id="end-popup" class="popup" style="padding: 30px; width: 450px;">
-        <div id="game-over-ui">
-            <p id="end-message" style="font-size: 32px; margin-bottom: 5px;"></p>
-            <p id="end-score" style="font-size: 20px; color: #0ff; margin-bottom: 5px;"></p>
-            <p id="run-rank" style="font-size: 14px; color: #ffdf00; margin-bottom: 15px; font-weight: bold;"></p>
-            <button id="revive-button" style="display: none; background: #ff0; color: #000; padding: 10px 20px; border: none; font-family: 'Press Start 2P'; cursor: pointer; margin-bottom: 10px;">REVIVE (50 💰)</button>
-            <button id="newgame-button">PLAY AGAIN</button>
-            <button id="show-leaderboard-btn" style="margin-top: 10px; background: transparent; border: 1px solid #fff; color: #fff; padding: 10px; width: 100%; cursor: pointer;">VIEW LEADERBOARD</button>
+        <p id="end-message" style="font-size: 32px; margin-bottom: 5px;"></p>
+        <p id="end-score" style="font-size: 20px; color: #0ff; margin-bottom: 5px;"></p>
+
+        <div id="nickname-section" style="display: none; margin-bottom: 20px;">
+            <p style="font-size: 12px; color: #aaa; margin-bottom: 8px;">SAVING SCORE...</p>
         </div>
 
-        <div id="leaderboard-container" style="display: none;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <p style="color: #ffdf00; font-size: 18px; margin: 0;">GLOBAL RANKING</p>
-                <span id="sync-status" style="color: #666; font-size: 10px;">SYNCING...</span>
+        <p id="run-rank" style="font-size: 14px; color: #ffdf00; margin-bottom: 15px; font-weight: bold;"></p>
+
+        <div id="leaderboard-box"
+            style="background: rgba(0,0,0,0.4); border: 1px solid #444; border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: left;">
+            <div
+                style="display: flex; justify-content: space-between; border-bottom: 1px solid #555; padding-bottom: 8px; margin-bottom: 10px;">
+                <span style="color: #ffdf00; font-size: 12px; font-weight: bold; letter-spacing: 1px;">GLOBAL
+                    LEADERBOARD (TOP 5)</span>
+                <span id="sync-status" style="color: #666; font-size: 10px;">LOCAL MODE</span>
             </div>
-            <div id="leaderboard-list" style="max-height: 300px; overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 5px; padding: 10px;">Loading...</div>
-            <button id="close-leaderboard-btn" style="margin-top: 20px; padding: 10px; background: #444; color: #fff; border: none; font-family: 'Press Start 2P'; cursor: pointer; font-size: 10px; width: 100%;">BACK</button>
+            <div id="leaderboard-list"></div>
         </div>
+
+        <div id="leaderboard-container" style="display: none; text-align: center;">
+             <button id="close-leaderboard-btn" style="margin-top: 10px; padding: 10px; background: #444; color: #fff; border: none; font-family: 'Press Start 2P'; cursor: pointer; font-size: 10px; width: 100%;">BACK</button>
+        </div>
+
+        <button id="revive-button" style="color: #ffdf00; border-color: #ffdf00; display: none; margin-bottom: 10px;">REVIVE (50 💰)</button>
+        <button id="newgame-button">PLAY AGAIN</button>
     </div>
 
     <div id="level-transition" class="popup">
@@ -2108,14 +2117,25 @@
         // Navigation Leaderboard
         function showLeaderboardOnly(fromPopup) {
             const endPopup = document.getElementById('end-popup');
-            const gameOverUI = document.getElementById('game-over-ui');
+            const leaderboardBox = document.getElementById('leaderboard-box');
             const leaderboardContainer = document.getElementById('leaderboard-container');
+            const nicknameSection = document.getElementById('nickname-section');
+            const newGameBtn = document.getElementById('newgame-button');
+            const reviveBtn = document.getElementById('revive-button');
+            const endMessage = document.getElementById('end-message');
+            const endScore = document.getElementById('end-score');
             
             fromPopup.style.display = 'none';
             endPopup.style.display = 'block';
             overlay.style.display = 'block';
             
-            gameOverUI.style.display = 'none';
+            // Masquer tout sauf le leaderboard
+            endMessage.style.display = 'none';
+            endScore.style.display = 'none';
+            newGameBtn.style.display = 'none';
+            reviveBtn.style.display = 'none';
+            nicknameSection.style.display = 'none';
+            leaderboardBox.style.display = 'block';
             leaderboardContainer.style.display = 'block';
             
             updateLeaderboard(0, true);
@@ -2123,15 +2143,16 @@
             document.getElementById('close-leaderboard-btn').onclick = () => {
                 endPopup.style.display = 'none';
                 fromPopup.style.display = 'block';
+                // Restaurer les affichages pour le vrai Game Over
+                endMessage.style.display = 'block';
+                endScore.style.display = 'block';
+                newGameBtn.style.display = 'block';
+                leaderboardContainer.style.display = 'none';
                 if (!state.isGameOver) overlay.style.display = 'none';
             };
         }
 
         document.getElementById('view-ranking-btn').onclick = () => showLeaderboardOnly(startPopup);
-        document.getElementById('show-leaderboard-btn').onclick = () => {
-            document.getElementById('game-over-ui').style.display = 'none';
-            document.getElementById('leaderboard-container').style.display = 'block';
-        };
 
         // Initialisation UI
         updateLivesHud();
