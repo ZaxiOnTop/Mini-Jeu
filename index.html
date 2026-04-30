@@ -868,6 +868,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyA96Ij3F3RoNY7xcaEfB6YRvCuwF5XH_hM",
             authDomain: "mini-jeu-b1f36.firebaseapp.com",
+            databaseURL: "https://mini-jeu-b1f36-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "mini-jeu-b1f36",
             storageBucket: "mini-jeu-b1f36.firebasestorage.app",
             messagingSenderId: "187643808763",
@@ -875,11 +876,12 @@
             measurementId: "G-43SWG3T5CL"
         };
 
-        // Initialisation optionnelle (ne plante pas si pas configuré)
+        // Initialisation optionnelle
         let db = null;
         try {
             firebase.initializeApp(firebaseConfig);
-            db = firebase.database();
+            // On force l'URL ici car elle est en europe-west1
+            db = firebase.app().database(firebaseConfig.databaseURL);
         } catch (e) {
             console.warn("Firebase non configuré. Utilisation du mode local.");
         }
@@ -1451,16 +1453,22 @@
             // 1. Charger les scores (Firebase ou Local)
             if (db) {
                 syncStatus.textContent = "SYNCING...";
+                
+                // On crée une promesse qui expire après 3 secondes
+                const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000));
+                
                 try {
-                    const snapshot = await db.ref('scores').orderByChild('score').limitToLast(50).once('value');
+                    const fetchScores = db.ref('scores').orderByChild('score').limitToLast(50).once('value');
+                    const snapshot = await Promise.race([fetchScores, timeout]);
+                    
                     const data = snapshot.val();
                     if (data) {
                         leaderboard = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                     }
                     syncStatus.textContent = "GLOBAL ONLINE";
                 } catch (e) {
-                    console.error("Firebase Read Error:", e);
-                    syncStatus.textContent = "OFFLINE MODE";
+                    console.error("Firebase Error or Timeout:", e);
+                    syncStatus.textContent = "LOCAL MODE (TIMEOUT)";
                 }
             }
 
