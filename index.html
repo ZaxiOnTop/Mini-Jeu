@@ -714,7 +714,6 @@
         <button id="resume-button">RESUME</button>
         <button id="shop-button" style="color: #ffdf00; border-color: #ffdf00;">SHOP</button>
         <button id="restart-button">RESTART</button>
-        <button id="pause-ranking-btn" style="margin-top: 10px; width: 100%; padding: 10px; background: transparent; color: #ffdf00; border: 1px solid #ffdf00; font-family: 'Press Start 2P'; font-size: 10px; cursor: pointer;">VIEW RANKING</button>
     </div>
 
     <div id="shop-popup" class="popup"
@@ -1657,13 +1656,13 @@
 
                 if (!isReadOnly && currentScore > 0) {
                     if (syncStatus) syncStatus.textContent = "SAVING...";
-                    const newRef = db.ref('leaderboard').push();
+                    const newRef = db.ref('scores').push();
                     await newRef.set({ name: nickname, score: currentScore, level: state.level, timestamp: Date.now() });
                     currentRunId = newRef.key;
                 }
 
                 if (syncStatus) syncStatus.textContent = "ONLINE";
-                const snapshot = await db.ref('leaderboard').orderByChild('score').limitToLast(20).once('value');
+                const snapshot = await db.ref('scores').orderByChild('score').limitToLast(20).once('value');
                 const data = snapshot.val();
                 let leaderboard = [];
                 if (data) {
@@ -2110,7 +2109,6 @@
         }
 
         document.getElementById('view-ranking-btn').onclick = () => showLeaderboardOnly(startPopup);
-        document.getElementById('pause-ranking-btn').onclick = () => showLeaderboardOnly(pausePopup);
         document.getElementById('show-leaderboard-btn').onclick = () => {
             document.getElementById('game-over-ui').style.display = 'none';
             document.getElementById('leaderboard-container').style.display = 'block';
