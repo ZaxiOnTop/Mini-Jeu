@@ -477,8 +477,8 @@
             inShop: false,
             isGameOver: false,
             bossActive: false,
-            bossMaxLife: 70,
-            bossLife: 70,
+            bossMaxLife: 56,
+            bossLife: 56,
             lastFrameTime: 0,
             slowTimeRemaining: 0, // In seconds
             energy: 0,
@@ -858,7 +858,7 @@
         function spawnBoss() {
             state.bossActive = true;
             bossLifeContainer.style.display = 'block';
-            state.bossMaxLife = 70 + (state.level - 1) * 50;
+            state.bossMaxLife = Math.floor(56 * (1 + 0.1 * (state.level - 1)));
             state.bossLife = state.bossMaxLife;
             updateBossLife();
 
@@ -942,20 +942,11 @@
 
             if (actualPhase === 1) {
                 const el = document.createElement('div'); el.className = 'big-enemy-laser'; container.appendChild(el);
-                let vx = 0;
-                let vy = laserSpeed;
-                
-                if (state.level >= 3) {
-                    // Slight homing effect at spawn
-                    const targetAngle = Math.atan2(player.x - boss.x, player.y - (boss.y + 50));
-                    const maxAngle = 35 * Math.PI / 180;
-                    const angle = Math.max(-maxAngle, Math.min(maxAngle, targetAngle));
-                    vx = Math.sin(angle) * laserSpeed;
-                    vy = Math.cos(angle) * laserSpeed;
-                    if (angle !== 0) el.style.transform = `translateX(-50%) rotate(${-angle * 180 / Math.PI}deg)`;
-                }
-                
-                enemyLasers.push({ el, x: boss.x, y: boss.y + 50, speed: laserSpeed, w: 6, h: 35, vx, vy });
+                enemyLasers.push({ 
+                    el, x: boss.x, y: boss.y + 50, speed: laserSpeed, 
+                    w: 6, h: 35, vx: 0, vy: laserSpeed, 
+                    isHoming: state.level >= 3 
+                });
             } else if (actualPhase === 2) {
                 const el1 = document.createElement('div'); el1.className = 'big-enemy-laser'; container.appendChild(el1);
                 const el2 = document.createElement('div'); el2.className = 'big-enemy-laser'; container.appendChild(el2);
@@ -1285,6 +1276,26 @@
             // Enemy Lasers
             for (let i = enemyLasers.length - 1; i >= 0; i--) {
                 let l = enemyLasers[i];
+                
+                if (l.isHoming) {
+                    let dx = player.x - l.x;
+                    let dy = player.y - l.y;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist > 0) {
+                        let speed = Math.sqrt(l.vx*l.vx + l.vy*l.vy);
+                        let steer = 2.0 * gameDt;
+                        l.vx += ((dx/dist)*speed - l.vx) * steer;
+                        l.vy += ((dy/dist)*speed - l.vy) * steer;
+                        
+                        let angle = Math.atan2(l.vx, l.vy);
+                        const maxAngle = 35 * Math.PI / 180;
+                        angle = Math.max(-maxAngle, Math.min(maxAngle, angle));
+                        l.vx = Math.sin(angle) * speed;
+                        l.vy = Math.cos(angle) * speed;
+                        l.el.style.transform = `translateX(-50%) rotate(${-angle * 180 / Math.PI}deg)`;
+                    }
+                }
+
                 if (l.vx !== undefined && l.vy !== undefined) {
                     l.x += l.vx * gameDt; l.y += l.vy * gameDt;
                 } else {
