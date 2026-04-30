@@ -1041,6 +1041,7 @@
         const endMessage = document.getElementById('end-message');
         const endScore = document.getElementById('end-score');
         const reviveBtn = document.getElementById('revive-button');
+        const newgameBtn = document.getElementById('newgame-button');
         const levelTransitionPopup = document.getElementById('level-transition');
         const levelText = document.getElementById('level-text');
 
@@ -1178,7 +1179,7 @@
 
         document.getElementById('resume-button').addEventListener('click', togglePause);
         document.getElementById('restart-button').addEventListener('click', () => location.reload());
-        document.getElementById('newgame-button').addEventListener('click', () => location.reload());
+        newgameBtn.addEventListener('click', () => location.reload());
 
         document.getElementById('shop-button').addEventListener('click', () => {
             pausePopup.style.display = 'none';
@@ -2116,12 +2117,8 @@
 
         // Navigation Leaderboard
         function showLeaderboardOnly(fromPopup) {
-            const endPopup = document.getElementById('end-popup');
             const leaderboardBox = document.getElementById('leaderboard-box');
             const leaderboardContainer = document.getElementById('leaderboard-container');
-            const nicknameSection = document.getElementById('nickname-section');
-            const newGameBtn = document.getElementById('newgame-button');
-            const reviveBtn = document.getElementById('revive-button');
             const endMessage = document.getElementById('end-message');
             const endScore = document.getElementById('end-score');
             
@@ -2132,9 +2129,9 @@
             // Masquer tout sauf le leaderboard
             endMessage.style.display = 'none';
             endScore.style.display = 'none';
-            newGameBtn.style.display = 'none';
+            newgameBtn.style.display = 'none';
             reviveBtn.style.display = 'none';
-            nicknameSection.style.display = 'none';
+            document.getElementById('nickname-section').style.display = 'none';
             leaderboardBox.style.display = 'block';
             leaderboardContainer.style.display = 'block';
             
@@ -2146,7 +2143,7 @@
                 // Restaurer les affichages pour le vrai Game Over
                 endMessage.style.display = 'block';
                 endScore.style.display = 'block';
-                newGameBtn.style.display = 'block';
+                newgameBtn.style.display = 'block';
                 leaderboardContainer.style.display = 'none';
                 if (!state.isGameOver) overlay.style.display = 'none';
             };
