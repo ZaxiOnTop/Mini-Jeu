@@ -1013,8 +1013,6 @@
             updateLevelCheck();
             updateCoinsHud();
         }
-        loadGameData();
-
 
         // DOM Elements
         const container = document.getElementById('game-container');
@@ -1044,6 +1042,8 @@
         const newgameBtn = document.getElementById('newgame-button');
         const levelTransitionPopup = document.getElementById('level-transition');
         const levelText = document.getElementById('level-text');
+
+        loadGameData();
 
         bestScoreEl.textContent = 'HIGHEST SCORE: ' + state.bestScore;
         coinsHudEl.textContent = '💰 ' + state.coins;
@@ -1715,7 +1715,7 @@
             document.getElementById('run-rank').textContent = "";
             updateLeaderboard(state.score);
 
-            if (!win && state.coins >= 100) {
+            if (!win && state.coins >= 50) {
                 reviveBtn.style.display = 'inline-block';
             } else {
                 reviveBtn.style.display = 'none';
