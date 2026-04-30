@@ -273,6 +273,10 @@
             background: transparent; border: none; box-shadow: none; pointer-events: none;
             animation: pulse-level 1s infinite alternate;
         }
+
+        .upgrade-bars { display: flex; gap: 4px; margin-top: 5px; }
+        .bar-segment { width: 12px; height: 6px; background-color: #333; border: 1px solid #555; border-radius: 2px; transition: 0.2s; }
+        .bar-segment.active { background-color: #0ff; border-color: #fff; box-shadow: 0 0 5px #0ff; }
         #level-transition p { font-size: 48px; color: #ff0; text-shadow: 0 0 20px #ff0, 0 0 40px #f00; margin: 0; }
         @keyframes pulse-level { from { transform: translate(-50%, -50%) scale(1); } to { transform: translate(-50%, -50%) scale(1.1); } }
 
@@ -376,23 +380,38 @@
         <h3 style="color: #0ff; margin-bottom: 10px; text-shadow: 1px 1px 0 #000; font-size: 16px;">UPGRADES</h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
             <div class="shop-item" style="margin-bottom: 0;">
-                <span>MAX LIVES +1</span>
+                <div>
+                    <span>MAX LIVES +1</span>
+                    <div class="upgrade-bars" id="bars-lives"><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                </div>
                 <button id="btn-buy-lives" onclick="buyUpgrade('lives', 50)">50 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
-                <span>BASE FIRE RATE +</span>
+                <div>
+                    <span>BASE FIRE RATE +</span>
+                    <div class="upgrade-bars" id="bars-fireRate"><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                </div>
                 <button id="btn-buy-fireRate" onclick="buyUpgrade('fireRate', 30)">30 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
-                <span>WEAPON & DAMAGE +</span>
+                <div>
+                    <span>BASE DAMAGE +</span>
+                    <div class="upgrade-bars" id="bars-weapon"><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                </div>
                 <button id="btn-buy-weapon" onclick="buyUpgrade('weapon', 100)">100 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
-                <span>SHIP SPEED +</span>
+                <div>
+                    <span>SHIP SPEED +</span>
+                    <div class="upgrade-bars" id="bars-speed"><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                </div>
                 <button id="btn-buy-speed" onclick="buyUpgrade('speed', 40)">40 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
-                <span>ENERGY CHARGE +</span>
+                <div>
+                    <span>ENERGY CHARGE +</span>
+                    <div class="upgrade-bars" id="bars-energy"><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                </div>
                 <button id="btn-buy-energy" onclick="buyUpgrade('energy', 60)">60 💰</button>
             </div>
         </div>
@@ -473,7 +492,7 @@
         coinsHudEl.textContent = '💰 ' + state.coins;
 
         // Player & Upgrades
-        let upgrades = { lives: 0, fireRate: 0, speed: 0, energy: 0, weapon: 1 };
+        let upgrades = { lives: 0, fireRate: 0, speed: 0, energy: 0, weapon: 0 };
         let inventory = { shield: 0, damage: 0, firerate: 0, homing: 0 };
 
         let player = { 
@@ -484,7 +503,7 @@
             maxLives: 3 + upgrades.lives,
             lives: 3 + upgrades.lives,
             invulnerable: 0,
-            weaponLevel: upgrades.weapon, // Starts at level 1, goes up to 5
+            weaponLevel: 1 + upgrades.weapon, // Starts at level 1, goes up to 6
             hasShield: false,
             dmgBoostTimer: 0,
             fireRateTimer: 0,
@@ -632,8 +651,24 @@
             }
         }
 
+        function updateBars(type, level) {
+            const container = document.getElementById('bars-' + type);
+            if (!container) return;
+            const segments = container.getElementsByClassName('bar-segment');
+            for(let i=0; i<5; i++) {
+                if (i < level) segments[i].classList.add('active');
+                else segments[i].classList.remove('active');
+            }
+        }
+
         function updateShopUI() {
             shopCoinsDisplay.textContent = '💰 ' + state.coins;
+            
+            updateBars('lives', upgrades.lives);
+            updateBars('fireRate', upgrades.fireRate || 0);
+            updateBars('weapon', upgrades.weapon);
+            updateBars('speed', upgrades.speed);
+            updateBars('energy', upgrades.energy);
             
             const costLives = 50 + upgrades.lives * 50;
             const btnLives = document.getElementById('btn-buy-lives');
@@ -696,7 +731,7 @@
                 // Apply immediate effects
                 if (type === 'lives') { player.maxLives++; player.lives++; updateLivesHud(); }
                 if (type === 'speed') { player.speed = 425 + upgrades.speed * 42.5; }
-                if (type === 'weapon') { player.weaponLevel = upgrades.weapon; }
+                if (type === 'weapon') { player.weaponLevel = 1 + upgrades.weapon; }
             }
         }
 
@@ -819,9 +854,10 @@
             switch(level) {
                 case 1: return { dmg: 1, color: '#0ff', angles: [0] };
                 case 2: return { dmg: 2, color: '#0f0', angles: [0] };
-                case 3: return { dmg: 2, color: '#ff0', angles: [0, -20, 20] };
-                case 4: return { dmg: 2, color: '#f90', angles: [0, -15, 15, -30, 30] };
-                case 5: return { dmg: 3, color: '#fff', angles: [0, -10, 10, -20, 20] };
+                case 3: return { dmg: 3, color: '#ff0', angles: [0] };
+                case 4: return { dmg: 4, color: '#f90', angles: [0] };
+                case 5: return { dmg: 5, color: '#fff', angles: [0] };
+                case 6: return { dmg: 6, color: '#f0f', angles: [0] };
                 default: return { dmg: 1, color: '#0ff', angles: [0] };
             }
         }
