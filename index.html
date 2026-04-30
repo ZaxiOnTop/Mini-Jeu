@@ -714,6 +714,7 @@
         <button id="resume-button">RESUME</button>
         <button id="shop-button" style="color: #ffdf00; border-color: #ffdf00;">SHOP</button>
         <button id="restart-button">RESTART</button>
+        <button id="pause-ranking-btn" style="margin-top: 10px; width: 100%; padding: 10px; background: transparent; color: #ffdf00; border: 1px solid #ffdf00; font-family: 'Press Start 2P'; font-size: 10px; cursor: pointer;">VIEW RANKING</button>
     </div>
 
     <div id="shop-popup" class="popup"
@@ -849,7 +850,9 @@
                 style="background: rgba(255,255,255,0.1); border: 2px solid #0ff; color: #fff; padding: 12px 20px; border-radius: 5px; font-family: 'Courier New', Courier, monospace; text-align: center; width: 200px; font-size: 18px; outline: none; box-shadow: 0 0 10px rgba(0,255,255,0.2);">
         </div>
 
-        <button id="start-game-btn" style="padding: 15px 40px; font-size: 20px; background: #0ff; color: #000; font-weight: bold; border-radius: 5px; cursor: pointer;">START GAME</button>
+        <button id="start-game-btn" style="padding: 15px 40px; font-size: 20px; background: #0ff; color: #000; font-weight: bold; border-radius: 5px; cursor: pointer; border: none; margin-bottom: 15px; width: 280px;">START GAME</button>
+        <br>
+        <button id="view-ranking-btn" style="padding: 10px 30px; font-size: 14px; background: transparent; color: #ffdf00; border: 2px solid #ffdf00; border-radius: 5px; cursor: pointer; width: 280px;">🏆 WORLD RANKING</button>
         
         <div style="margin-top: 40px; font-size: 10px; color: #555;">
             USE ARROWS TO MOVE • SPACE TO SHOOT • SHIFT FOR MEGA BEAM
@@ -857,29 +860,20 @@
     </div>
 
     <div id="end-popup" class="popup" style="padding: 30px; width: 450px;">
-        <p id="end-message" style="font-size: 32px; margin-bottom: 5px;"></p>
-        <p id="end-score" style="font-size: 20px; color: #0ff; margin-bottom: 5px;"></p>
-
-        <div id="nickname-section" style="display: none; margin-bottom: 20px;">
-            <p style="font-size: 12px; color: #aaa; margin-bottom: 8px;">SAVING SCORE...</p>
+        <div id="game-over-ui">
+            <p id="end-message" style="font-size: 32px; margin-bottom: 5px;"></p>
+            <p id="end-score" style="font-size: 20px; color: #0ff; margin-bottom: 5px;"></p>
+            <p id="run-rank" style="font-size: 14px; color: #ffdf00; margin-bottom: 15px; font-weight: bold;"></p>
+            <button id="revive-button" style="display: none; background: #ff0; color: #000; padding: 10px 20px; border: none; font-family: 'Press Start 2P'; cursor: pointer; margin-bottom: 10px;">REVIVE (50 💰)</button>
+            <button id="newgame-button">PLAY AGAIN</button>
+            <button id="show-leaderboard-btn" style="margin-top: 10px; background: transparent; border: 1px solid #fff; color: #fff; padding: 10px; width: 100%; cursor: pointer;">VIEW LEADERBOARD</button>
         </div>
 
-        <p id="run-rank" style="font-size: 14px; color: #ffdf00; margin-bottom: 15px; font-weight: bold;"></p>
-
-        <div id="leaderboard-box"
-            style="background: rgba(0,0,0,0.4); border: 1px solid #444; border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: left;">
-            <div
-                style="display: flex; justify-content: space-between; border-bottom: 1px solid #555; padding-bottom: 8px; margin-bottom: 10px;">
-                <span style="color: #ffdf00; font-size: 12px; font-weight: bold; letter-spacing: 1px;">GLOBAL
-                    LEADERBOARD (TOP 5)</span>
-                <span id="sync-status" style="color: #666; font-size: 10px;">LOCAL MODE</span>
-            </div>
-            <div id="leaderboard-list"></div>
+        <div id="leaderboard-container" style="display: none;">
+            <p style="color: #ffdf00; font-size: 18px; margin-bottom: 15px;">GLOBAL LEADERBOARD</p>
+            <div id="leaderboard-list">Loading...</div>
+            <button id="close-leaderboard-btn" style="margin-top: 20px; padding: 10px; background: #444; color: #fff; border: none; font-family: 'Press Start 2P'; cursor: pointer; font-size: 10px; width: 100%;">BACK</button>
         </div>
-
-        <button id="revive-button" style="color: #ffdf00; border-color: #ffdf00; display: none;">REVIVE (100
-            💰)</button>
-        <button id="newgame-button">PLAY AGAIN</button>
     </div>
 
     <div id="level-transition" class="popup">
@@ -1601,11 +1595,11 @@
         }
 
         function revivePlayer() {
-            if (state.coins >= 100) {
-                state.coins -= 100;
+            if (state.coins >= 50) {
+                state.coins -= 50;
                 updateCoinsHud();
                 state.isGameOver = false;
-                player.lives = 1;
+                player.lives = 2;
                 updateLivesHud();
                 player.invulnerable = 3.0; // 3 seconds of safety
                 player.hasShield = true;
@@ -1623,88 +1617,58 @@
         function updateLeaderboardUI(leaderboard, currentRunId = null) {
             const listEl = document.getElementById('leaderboard-list');
             listEl.innerHTML = '';
-
-            leaderboard.slice(0, 5).forEach((entry, i) => {
+            leaderboard.slice(0, 10).forEach((entry, i) => {
                 const isCurrent = entry.id === currentRunId;
                 const div = document.createElement('div');
-                div.className = 'leaderboard-entry' + (isCurrent ? ' current' : '');
-                div.innerHTML = `<span>#${i + 1} ${entry.name}</span><span>${entry.score.toLocaleString()}</span>`;
+                div.style.display = 'flex';
+                div.style.justifyContent = 'space-between';
+                div.style.padding = '8px 10px';
+                div.style.borderBottom = '1px solid #333';
+                if (isCurrent) div.style.background = 'rgba(255, 223, 0, 0.2)';
+                div.innerHTML = `
+                    <span style="color: ${i < 3 ? '#ffdf00' : '#fff'}; font-size: 12px;">#${i + 1} ${entry.name}</span>
+                    <span style="color: #0ff; font-size: 12px;">LVL ${entry.level || '?'} • ${entry.score.toLocaleString()}</span>
+                `;
                 listEl.appendChild(div);
             });
         }
 
-        async function updateLeaderboard(currentScore) {
-            // VERIFICATION ANTI-TRICHE RENFORCÉE
-            const integrityScore = currentScore * 123 + 456;
-            const integrityLevel = state.level * 777 + 888;
-            const maxPossible = state.level * 100000; // Un peu plus large pour les longues runs
-            
-            if (currentScore !== state.score || integrityScore !== state._scoreCheck || 
-                integrityLevel !== state._levelCheck || currentScore > maxPossible) {
-                console.error("CHEAT DETECTED: Illegal level/score combination.");
-                document.getElementById('sync-status').textContent = "SYSTEM COMPROMISED";
-                document.getElementById('run-rank').textContent = "CHEATER BANNED";
-                return;
-            }
-
+        async function updateLeaderboard(currentScore = 0, isReadOnly = false) {
+            if (!db) return;
+            const listEl = document.getElementById('leaderboard-list');
             const syncStatus = document.getElementById('sync-status');
-            const nicknameSection = document.getElementById('nickname-section');
-            const currentName = localStorage.getItem('spaceInvadersNickname') || "PILOT";
             
-            nicknameSection.style.display = 'block';
-            nicknameSection.innerHTML = `<p style="font-size: 12px; color: #aaa;">SAVING SCORE FOR <b>${currentName}</b>...</p>`;
-            
-            let currentRunId = Date.now().toString();
-            let leaderboard = [];
+            if (!isReadOnly) {
+                // VERIFICATION ANTI-TRICHE
+                const integrityScore = currentScore * 123 + 456;
+                const integrityLevel = state.level * 777 + 888;
+                if (currentScore !== state.score || integrityScore !== state._scoreCheck || integrityLevel !== state._levelCheck) {
+                    console.error("CHEAT DETECTED");
+                    return;
+                }
+            }
 
-            // 1. Sauvegarde automatique et Chargement
-            if (db) {
-                syncStatus.textContent = "SYNCING...";
-                const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000));
-                
-                try {
-                    // Envoi automatique
-                    const newRef = db.ref('scores').push();
-                    await Promise.race([newRef.set({ name: currentName, score: currentScore, date: Date.now() }), timeout]);
+            try {
+                let currentRunId = null;
+                const nickname = localStorage.getItem('spaceInvadersNickname') || "PILOT";
+
+                if (!isReadOnly && currentScore > 0) {
+                    const newRef = db.ref('leaderboard').push();
+                    await newRef.set({ name: nickname, score: currentScore, level: state.level, timestamp: Date.now() });
                     currentRunId = newRef.key;
-
-                    // Récupération du Top 50
-                    const fetchScores = db.ref('scores').orderByChild('score').limitToLast(50).once('value');
-                    const snapshot = await Promise.race([fetchScores, timeout]);
-                    
-                    const data = snapshot.val();
-                    if (data) {
-                        leaderboard = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                    }
-                    syncStatus.textContent = "GLOBAL ONLINE";
-                    nicknameSection.style.display = 'none';
-                } catch (e) {
-                    console.error("Firebase Error:", e);
-                    syncStatus.textContent = "LOCAL MODE (OFFLINE)";
-                    nicknameSection.innerHTML = `<p style="font-size: 12px; color: #f44;">OFFLINE - SCORE SAVED LOCALLY</p>`;
                 }
-            }
-            
-            if (leaderboard.length === 0) {
-                leaderboard = JSON.parse(localStorage.getItem('spaceInvadersLeaderboard')) || [
-                    { id: '1', name: "X-WING", score: 50000 },
-                    { id: '2', name: "SKYWALKER", score: 35000 },
-                    { id: '3', name: "BOUNTY", score: 22000 },
-                    { id: '4', name: "DROID", score: 15000 },
-                    { id: '5', name: "REBEL", score: 8000 }
-                ];
-                if (!db) {
-                    leaderboard.push({ id: currentRunId, name: currentName, score: currentScore });
+
+                const snapshot = await db.ref('leaderboard').orderByChild('score').limitToLast(20).once('value');
+                const data = snapshot.val();
+                let leaderboard = [];
+                if (data) {
+                    leaderboard = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                     leaderboard.sort((a, b) => b.score - a.score);
-                    localStorage.setItem('spaceInvadersLeaderboard', JSON.stringify(leaderboard.slice(0, 50)));
-                    nicknameSection.style.display = 'none';
                 }
+                updateLeaderboardUI(leaderboard, currentRunId);
+            } catch(e) { 
+                listEl.innerHTML = '<p style="color:#f44">Offline - Check connection</p>';
             }
-
-            leaderboard.sort((a, b) => b.score - a.score);
-            const rank = leaderboard.findIndex(e => e.id === currentRunId) + 1;
-            document.getElementById('run-rank').textContent = `YOUR WORLD RANK: #${rank}`;
-            updateLeaderboardUI(leaderboard, currentRunId);
         }
 
         function endGame(win) {
@@ -2118,10 +2082,39 @@
             startLevelTransition();
         };
 
+        // Navigation Leaderboard
+        function showLeaderboardOnly(fromPopup) {
+            const endPopup = document.getElementById('end-popup');
+            const gameOverUI = document.getElementById('game-over-ui');
+            const leaderboardContainer = document.getElementById('leaderboard-container');
+            
+            fromPopup.style.display = 'none';
+            endPopup.style.display = 'block';
+            overlay.style.display = 'block';
+            
+            gameOverUI.style.display = 'none';
+            leaderboardContainer.style.display = 'block';
+            
+            updateLeaderboard(0, true);
+
+            document.getElementById('close-leaderboard-btn').onclick = () => {
+                endPopup.style.display = 'none';
+                fromPopup.style.display = 'block';
+                if (!state.isGameOver) overlay.style.display = 'none';
+            };
+        }
+
+        document.getElementById('view-ranking-btn').onclick = () => showLeaderboardOnly(startPopup);
+        document.getElementById('pause-ranking-btn').onclick = () => showLeaderboardOnly(pausePopup);
+        document.getElementById('show-leaderboard-btn').onclick = () => {
+            document.getElementById('game-over-ui').style.display = 'none';
+            document.getElementById('leaderboard-container').style.display = 'block';
+        };
+
         // Initialisation UI
         updateLivesHud();
         updateCoinsHud();
-        
+
         })(); // FIN ENCAPSULATION ANTI-TRICHE
     </script>
 </body>
