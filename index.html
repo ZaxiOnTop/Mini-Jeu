@@ -418,10 +418,34 @@
 
         <h3 style="color: #0ff; margin-top: 25px; margin-bottom: 10px; text-shadow: 1px 1px 0 #000; font-size: 16px;">CONSUMABLES</h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
-            <div class="shop-item" style="margin-bottom: 0;"><span>🛡️ SHIELD</span><button id="btn-buy-shield" onclick="buyConsumable('shield', 20)">20 💰</button></div>
-            <div class="shop-item" style="margin-bottom: 0;"><span>💥 DMG x2</span><button id="btn-buy-damage" onclick="buyConsumable('damage', 25)">25 💰</button></div>
-            <div class="shop-item" style="margin-bottom: 0;"><span>⚡ FIRE RATE</span><button id="btn-buy-firerate" onclick="buyConsumable('firerate', 25)">25 💰</button></div>
-            <div class="shop-item" style="margin-bottom: 0;"><span>🎯 HOMING</span><button id="btn-buy-homing" onclick="buyConsumable('homing', 30)">30 💰</button></div>
+            <div class="shop-item" style="margin-bottom: 0;">
+                <div>
+                    <span>🛡️ SHIELD</span>
+                    <div class="upgrade-bars" id="bars-inv-shield"><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                </div>
+                <button id="btn-buy-shield" onclick="buyConsumable('shield', 20)">20 💰</button>
+            </div>
+            <div class="shop-item" style="margin-bottom: 0;">
+                <div>
+                    <span>💥 DMG x2</span>
+                    <div class="upgrade-bars" id="bars-inv-damage"><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                </div>
+                <button id="btn-buy-damage" onclick="buyConsumable('damage', 25)">25 💰</button>
+            </div>
+            <div class="shop-item" style="margin-bottom: 0;">
+                <div>
+                    <span>⚡ FIRE RATE</span>
+                    <div class="upgrade-bars" id="bars-inv-firerate"><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                </div>
+                <button id="btn-buy-firerate" onclick="buyConsumable('firerate', 25)">25 💰</button>
+            </div>
+            <div class="shop-item" style="margin-bottom: 0;">
+                <div>
+                    <span>🎯 HOMING</span>
+                    <div class="upgrade-bars" id="bars-inv-homing"><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                </div>
+                <button id="btn-buy-homing" onclick="buyConsumable('homing', 30)">30 💰</button>
+            </div>
         </div>
 
         <button id="shop-close-btn" onclick="closeShop()" style="margin-top: 20px;">BACK TO PAUSE</button>
@@ -655,7 +679,7 @@
             const container = document.getElementById('bars-' + type);
             if (!container) return;
             const segments = container.getElementsByClassName('bar-segment');
-            for(let i=0; i<5; i++) {
+            for(let i=0; i<segments.length; i++) {
                 if (i < level) segments[i].classList.add('active');
                 else segments[i].classList.remove('active');
             }
@@ -697,14 +721,19 @@
             btnWeapon.textContent = upgrades.weapon >= 5 ? 'MAX' : costWeapon + ' 💰';
             btnWeapon.disabled = upgrades.weapon >= 5 || state.coins < costWeapon;
 
-            document.getElementById('btn-buy-shield').disabled = state.coins < 20;
-            document.getElementById('btn-buy-damage').disabled = state.coins < 25;
-            document.getElementById('btn-buy-firerate').disabled = state.coins < 25;
-            document.getElementById('btn-buy-homing').disabled = state.coins < 30;
+            ['shield', 'damage', 'firerate', 'homing'].forEach(type => {
+                updateBars('inv-' + type, inventory[type]);
+                const btn = document.getElementById('btn-buy-' + type);
+                const cost = type === 'shield' ? 20 : (type === 'homing' ? 30 : 25);
+                if (btn) {
+                    btn.textContent = inventory[type] >= 2 ? 'MAX' : cost + ' 💰';
+                    btn.disabled = inventory[type] >= 2 || state.coins < cost;
+                }
+            });
         }
 
         window.buyConsumable = function(type, cost) {
-            if (state.coins >= cost) {
+            if (state.coins >= cost && inventory[type] < 2) {
                 state.coins -= cost;
                 inventory[type]++;
                 updateCoinsHud();
