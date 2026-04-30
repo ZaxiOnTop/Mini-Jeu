@@ -1371,22 +1371,28 @@
         function spawnWave() {
             if (state.bossActive || state.transitioning) return;
             
+            // Limite d'ennemis pour éviter le chaos (5 + 2 par niveau)
+            const maxEnemies = 5 + (state.level * 2);
+            if (enemies.length >= maxEnemies) return;
+
             const r = Math.random();
             const level = state.level;
 
-            // Sélection du type
+            // Sélection du type (plus progressif)
             let type = 'SCOUT';
-            if (level >= 2 && r > 0.7) type = 'INTERCEPTOR';
-            if (level >= 4 && r > 0.85) type = 'TANK';
-            if (level >= 6 && r > 0.9) type = 'KAMIKAZE';
-            if (Math.random() < 0.05) type = 'ASTEROID';
+            if (level >= 3 && r > 0.7) type = 'INTERCEPTOR';
+            if (level >= 5 && r > 0.85) type = 'TANK';
+            if (level >= 7 && r > 0.9) type = 'KAMIKAZE';
+            if (level >= 4 && Math.random() < 0.05) type = 'ASTEROID';
 
-            // 25% de chance de spawn une escadrille (sauf pour Tank/Asteroid)
-            if (Math.random() < 0.25 && type !== 'TANK' && type !== 'ASTEROID') {
-                const count = 3 + Math.floor(Math.random() * 3);
-                const startX = 100 + Math.random() * (window.innerWidth - 300);
+            // Formations (Escadrilles) : Uniquement à partir du Niveau 2
+            const canSpawnFormation = level >= 2 && type !== 'TANK' && type !== 'ASTEROID' && enemies.length < (maxEnemies - 3);
+            
+            if (Math.random() < 0.3 && canSpawnFormation) {
+                const count = level >= 5 ? 4 : 3; // Petites vagues au début
+                const startX = 150 + Math.random() * (window.innerWidth - 300);
                 for(let i=0; i<count; i++) {
-                    setTimeout(() => spawnEnemy(type, startX + (i * 60 - (count * 30)), -60 - (i * 40)), i * 150);
+                    setTimeout(() => spawnEnemy(type, startX + (i * 60 - (count * 30)), -60 - (i * 30)), i * 200);
                 }
             } else {
                 spawnEnemy(type);
@@ -1807,7 +1813,8 @@
                 if (enemySpawnTimer > nextSpawnInterval) {
                     spawnWave(); 
                     enemySpawnTimer = 0; 
-                    nextSpawnInterval = Math.max(400, 1600 - (state.level * 100));
+                    // Intervalle plus long au début (2.5s) et descend moins vite
+                    nextSpawnInterval = Math.max(700, 2500 - (state.level * 150));
                 }
             }
             powerupTimer += gameDt * 1000;
