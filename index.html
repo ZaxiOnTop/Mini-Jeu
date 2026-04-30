@@ -928,11 +928,20 @@
             isPaused: false,
             isGameOver: false,
             energy: 0,
-            _coinsCheck: 0, // Signature des pièces
+            _levelCheck: 0, // Protection du niveau
+            _coinsCheck: 0,
             keys: { ArrowLeft: false, ArrowRight: false, Space: false, Shift: false }
         };
 
+        // Initialisation des signatures
+        state._levelCheck = state.level * 777 + 888;
+        state._scoreCheck = state.score * 123 + 456;
         state._coinsCheck = state.coins * 456 + 789;
+
+        function updateLevelCheck() {
+            state._levelCheck = state.level * 777 + 888;
+        }
+
 
         // Fonction sécurisée pour ajouter du score
         function addScore(points) {
@@ -952,11 +961,13 @@
                 coins: state.coins,
                 upgrades: upgrades,
                 bestScore: state.bestScore,
-                inventory: inventory
+                inventory: inventory,
+                level: state.level // On sauve aussi le niveau pour la cohérence
             };
             const json = JSON.stringify(data);
-            // On crée une signature simple pour empêcher l'édition manuelle du JSON
-            const signature = btoa(json).split('').reverse().join(''); 
+            // Signature beaucoup plus complexe pour décourager ton pote
+            const salt = "S3CUR3_SP4C3_" + state.level;
+            const signature = btoa(unescape(encodeURIComponent(json + salt))).split('').reverse().join('X'); 
             localStorage.setItem('spaceInvadersSave', json);
             localStorage.setItem('spaceInvadersSig', signature);
         }
@@ -965,18 +976,24 @@
             const json = localStorage.getItem('spaceInvadersSave');
             const sig = localStorage.getItem('spaceInvadersSig');
             if (json && sig) {
-                const expectedSig = btoa(json).split('').reverse().join('');
+                const data = JSON.parse(json);
+                const salt = "S3CUR3_SP4C3_" + (data.level || 1);
+                const expectedSig = btoa(unescape(encodeURIComponent(json + salt))).split('').reverse().join('X');
+                
                 if (sig === expectedSig) {
-                    const data = JSON.parse(json);
                     state.coins = data.coins || 0;
-                    state._coinsCheck = state.coins * 456 + 789;
                     state.bestScore = data.bestScore || 0;
+                    // On ne restaure PAS le niveau pour éviter de skip des boss, 
+                    // mais on vérifie la cohérence
                     upgrades = data.upgrades || upgrades;
                     inventory = data.inventory || inventory;
                 } else {
-                    console.warn("Save corruption detected (Anti-cheat). Resetting.");
+                    console.warn("Anti-cheat: Save corrupted.");
+                    localStorage.clear(); // Punition : on rase tout
                 }
             }
+            state._coinsCheck = state.coins * 456 + 789;
+            updateLevelCheck();
         }
         loadGameData();
 
@@ -1159,7 +1176,10 @@
             state.inShop = false;
             if (state.shopFromLevelEnd) {
                 state.level++;
+                updateLevelCheck(); // Protection anti-triche
+                state.enemiesKilledThisLevel = 0;
                 state.isPaused = false;
+                saveGameData();
                 startLevelTransition();
             } else {
                 pausePopup.style.display = 'block';
@@ -1585,14 +1605,16 @@
         }
 
         async function updateLeaderboard(currentScore) {
-            // VERIFICATION ANTI-TRICHE
-            const integrityCheck = currentScore * 123 + 456;
-            const maxPossible = state.level * 50000; // Limite large mais réaliste
+            // VERIFICATION ANTI-TRICHE RENFORCÉE
+            const integrityScore = currentScore * 123 + 456;
+            const integrityLevel = state.level * 777 + 888;
+            const maxPossible = state.level * 100000; // Un peu plus large pour les longues runs
             
-            if (currentScore !== state.score || integrityCheck !== state._scoreCheck || currentScore > maxPossible) {
-                console.error("CHEAT DETECTED: Score rejected.");
-                document.getElementById('sync-status').textContent = "CHEAT DETECTED";
-                document.getElementById('run-rank').textContent = "SCORE REJECTED (INTEGRITY ERROR)";
+            if (currentScore !== state.score || integrityScore !== state._scoreCheck || 
+                integrityLevel !== state._levelCheck || currentScore > maxPossible) {
+                console.error("CHEAT DETECTED: Illegal level/score combination.");
+                document.getElementById('sync-status').textContent = "SYSTEM COMPROMISED";
+                document.getElementById('run-rank').textContent = "CHEATER BANNED";
                 return;
             }
 
@@ -1737,9 +1759,11 @@
                         if (e.x > player.x - 30 && e.x < player.x + 30 && e.y < player.y) {
                             e.hp -= 14 * dt; // 14 damage per second (reduced by 30%)
                             if (e.hp <= 0) {
-                                createExplosion(e.x, e.y, '#ff0'); state.coins += (e.type || 1); updateCoinsHud();
+                                createExplosion(e.x, e.y, '#ff0'); 
+                                addCoins(e.type === 'ASTEROID' ? 5 : 1);
                                 e.el.remove(); enemies.splice(i, 1);
-                                state.score += 10 * (e.type || 1); state.enemiesKilledThisLevel++;
+                                addScore(10 * (e.type === 'SCOUT' ? 1 : 2)); 
+                                state.enemiesKilledThisLevel++;
                                 scoreEl.textContent = 'SCORE: ' + state.score;
                             }
                         }
