@@ -293,6 +293,7 @@
         #inventory-container {
             position: absolute; bottom: 20px; left: 20px;
             display: flex; gap: 15px; z-index: 100;
+            transition: opacity 0.2s;
         }
         .inv-slot {
             background: rgba(0, 0, 0, 0.7); border: 2px solid #555;
@@ -1019,7 +1020,7 @@
                         if (e.x > player.x - 30 && e.x < player.x + 30 && e.y < player.y) {
                             e.hp -= 20 * dt; // 20 damage per second
                             if (e.hp <= 0) {
-                                createExplosion(e.x, e.y, '#ff0'); spawnCoin(e.x, e.y);
+                                createExplosion(e.x, e.y, '#ff0'); state.coins += (e.type || 1); updateCoinsHud();
                                 e.el.remove(); enemies.splice(i, 1);
                                 state.score += 10 * (e.type || 1); state.enemiesKilledThisLevel++;
                                 scoreEl.textContent = 'SCORE: ' + state.score;
@@ -1055,6 +1056,10 @@
             player.x = Math.max(30, Math.min(window.innerWidth - 30, player.x));
             spaceship.style.left = player.x + 'px';
             if (player.cooldown > 0) player.cooldown -= dt;
+            
+            const invContainer = document.getElementById('inventory-container');
+            if (player.x < 300) invContainer.style.opacity = '0.5';
+            else invContainer.style.opacity = '1';
 
             // Spawns
             if (!state.bossActive) {
