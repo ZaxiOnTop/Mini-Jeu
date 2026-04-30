@@ -1309,35 +1309,70 @@
             }, 2500);
         }
 
-        // Spawning Logic
-        function spawnEnemy() {
-            if (state.bossActive || state.transitioning) return;
+        // Configuration des types d'ennemis
+        const ENEMY_TYPES = {
+            SCOUT: { hp: 1, speed: 1.0, fireRate: 0.005, score: 10, filter: 'none' },
+            INTERCEPTOR: { hp: 1, speed: 1.8, fireRate: 0.008, score: 25, filter: 'hue-rotate(120deg) brightness(1.2)', zigZag: true },
+            TANK: { hp: 5, speed: 0.6, fireRate: 0.012, score: 60, filter: 'hue-rotate(300deg) saturate(2)', size: 60 },
+            KAMIKAZE: { hp: 1, speed: 4.0, fireRate: 0, score: 30, filter: 'hue-rotate(45deg) saturate(3) contrast(1.5)', dash: true },
+            ASTEROID: { hp: 10, speed: 1.5, fireRate: 0, score: 5, filter: 'grayscale(1) brightness(0.7)', size: 80, isHazard: true }
+        };
 
+        function spawnEnemy(typeKey = 'SCOUT', customX = null, customY = -60) {
+            if (state.bossActive || state.transitioning) return;
+            const config = ENEMY_TYPES[typeKey];
+            const container = document.getElementById('game-container');
+            
             const el = document.createElement('div');
+            el.className = 'enemy';
+            const size = config.size || 40;
+            el.style.width = size + 'px';
+            el.style.height = size + 'px';
+            
             const img = document.createElement('img');
             img.src = 'Image/modele-autocollant-objet-volant-non-identifie-ovni-isole_1308-57963-removebg-preview.png';
+            img.style.filter = config.filter;
             el.appendChild(img);
             container.appendChild(el);
 
-            const x = 50 + Math.random() * (window.innerWidth - 100);
-            let r = Math.random(); let type = 1;
+            const x = customX !== null ? customX : 50 + Math.random() * (window.innerWidth - 100);
+            
+            enemies.push({
+                el, x, y: customY,
+                type: typeKey,
+                hp: config.hp,
+                maxHp: config.hp,
+                speed: (130 + (state.level * 15)) * config.speed,
+                width: size, height: size,
+                baseX: x,
+                zigZagOffset: Math.random() * Math.PI * 2,
+                fireRate: config.fireRate + (state.level * 0.001)
+            });
+        }
 
-            if (state.level === 2 && r > 0.7) type = 2;
-            else if (state.level === 3) type = r > 0.8 ? 3 : (r > 0.5 ? 2 : 1);
-            else if (state.level >= 4) type = r > 0.8 ? 4 : (r > 0.6 ? 3 : (r > 0.4 ? 2 : 1));
+        function spawnWave() {
+            if (state.bossActive || state.transitioning) return;
+            
+            const r = Math.random();
+            const level = state.level;
 
-            let enemy = { el, type, x, y: -50, speed: 0, hp: 1, maxHp: 1, width: 40, height: 40 };
+            // Sélection du type
+            let type = 'SCOUT';
+            if (level >= 2 && r > 0.7) type = 'INTERCEPTOR';
+            if (level >= 4 && r > 0.85) type = 'TANK';
+            if (level >= 6 && r > 0.9) type = 'KAMIKAZE';
+            if (Math.random() < 0.05) type = 'ASTEROID';
 
-            el.className = 'enemy enemy-type-' + type;
-            const baseSpeed = 85 + Math.random() * 42.5;
-
-            if (type === 1) { enemy.speed = baseSpeed * (1 + (state.level - 1) * 0.15); enemy.hp = 1; }
-            else if (type === 2) { enemy.speed = baseSpeed * 0.8 * (1 + (state.level - 1) * 0.1); enemy.hp = 1; enemy.shootTimer = 0; enemy.nextShoot = 1.725 + Math.random() * 2.3; }
-            else if (type === 3) { enemy.speed = baseSpeed * 0.7 * (1 + (state.level - 1) * 0.1); enemy.hp = 2; enemy.waveTime = Math.random() * 10; enemy.dirX = Math.random() > 0.5 ? 1 : -1; }
-            else if (type === 4) { enemy.speed = baseSpeed * 0.4 * (1 + (state.level - 1) * 0.05); enemy.hp = 4; enemy.width = 55; enemy.height = 55; }
-
-            enemy.maxHp = enemy.hp;
-            enemies.push(enemy);
+            // 25% de chance de spawn une escadrille (sauf pour Tank/Asteroid)
+            if (Math.random() < 0.25 && type !== 'TANK' && type !== 'ASTEROID') {
+                const count = 3 + Math.floor(Math.random() * 3);
+                const startX = 100 + Math.random() * (window.innerWidth - 300);
+                for(let i=0; i<count; i++) {
+                    setTimeout(() => spawnEnemy(type, startX + (i * 60 - (count * 30)), -60 - (i * 40)), i * 150);
+                }
+            } else {
+                spawnEnemy(type);
+            }
         }
 
         function enemyShoot(enemy) {
@@ -1747,7 +1782,9 @@
             if (!state.bossActive) {
                 enemySpawnTimer += gameDt * 1000;
                 if (enemySpawnTimer > nextSpawnInterval) {
-                    spawnEnemy(); enemySpawnTimer = 0; nextSpawnInterval = Math.max(690, 1725 - (state.level * 172.5));
+                    spawnWave(); 
+                    enemySpawnTimer = 0; 
+                    nextSpawnInterval = Math.max(400, 1600 - (state.level * 100));
                 }
             }
             powerupTimer += gameDt * 1000;
@@ -1784,20 +1821,29 @@
             // Enemies
             for (let i = enemies.length - 1; i >= 0; i--) {
                 let e = enemies[i];
-                if (e.type === 3) {
-                    e.waveTime += gameDt; e.x += e.dirX * 85 * gameDt;
-                    if (e.x < 30 || e.x > window.innerWidth - 30) { e.dirX *= -1; e.x = Math.max(30, Math.min(window.innerWidth - 30, e.x)); }
-                }
-                e.y += e.speed * gameDt; e.el.style.left = e.x + 'px'; e.el.style.top = e.y + 'px';
+                const config = ENEMY_TYPES[e.type];
 
-                if (e.type === 2) {
-                    e.shootTimer += gameDt;
-                    if (e.shootTimer > e.nextShoot) { enemyShoot(e); e.shootTimer = 0; e.nextShoot = 2.0 + Math.random() * 3.0; }
+                // Mouvements spéciaux
+                if (config.zigZag) {
+                    e.x = e.baseX + Math.sin(timestamp / 300 + e.zigZagOffset) * 120;
                 }
+                
+                e.y += e.speed * gameDt;
+                e.el.style.left = e.x + 'px'; e.el.style.top = e.y + 'px';
+
+                // Tir aléatoire
+                if (Math.random() < (e.fireRate || 0)) enemyShoot(e);
 
                 if (checkCollision(player.x, player.y, 40, 40, e.x, e.y, e.width, e.height)) {
-                    if (hitPlayer()) { createExplosion(e.x, e.y, '#ff0'); e.el.remove(); enemies.splice(i, 1); }
-                } else if (e.y > window.innerHeight + 50) { e.el.remove(); enemies.splice(i, 1); }
+                    // Les astéroïdes font plus de dégâts
+                    const dmg = e.type === 'ASTEROID' ? 4 : 2; 
+                    if (hitPlayer(dmg)) { 
+                        createExplosion(e.x, e.y, '#ff0'); 
+                        e.el.remove(); enemies.splice(i, 1); 
+                    }
+                } else if (e.y > window.innerHeight + 100) { 
+                    e.el.remove(); enemies.splice(i, 1); 
+                }
             }
 
             // Boss Logic & Phases
