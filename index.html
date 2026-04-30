@@ -379,8 +379,8 @@
                 <button id="btn-buy-lives" onclick="buyUpgrade('lives', 50)">50 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
-                <span>MAGNET RANGE +</span>
-                <button id="btn-buy-magnet" onclick="buyUpgrade('magnet', 30)">30 💰</button>
+                <span>BASE FIRE RATE +</span>
+                <button id="btn-buy-fireRate" onclick="buyUpgrade('fireRate', 30)">30 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <span>SHIP SPEED +</span>
@@ -472,7 +472,7 @@
         coinsHudEl.textContent = '💰 ' + state.coins;
 
         // Player & Upgrades
-        let upgrades = { lives: 0, magnet: 0, speed: 0, energy: 0, weapon: 1 };
+        let upgrades = { lives: 0, fireRate: 0, speed: 0, energy: 0, weapon: 1 };
         let inventory = { shield: 0, damage: 0, firerate: 0, homing: 0 };
 
         let player = { 
@@ -638,10 +638,10 @@
             btnLives.textContent = upgrades.lives >= 5 ? 'MAX' : costLives + ' 💰';
             btnLives.disabled = upgrades.lives >= 5 || state.coins < costLives;
 
-            const costMagnet = 30 + upgrades.magnet * 20;
-            const btnMagnet = document.getElementById('btn-buy-magnet');
-            btnMagnet.textContent = upgrades.magnet >= 5 ? 'MAX' : costMagnet + ' 💰';
-            btnMagnet.disabled = upgrades.magnet >= 5 || state.coins < costMagnet;
+            const costFireRate = 30 + (upgrades.fireRate || 0) * 20;
+            const btnFireRate = document.getElementById('btn-buy-fireRate');
+            btnFireRate.textContent = (upgrades.fireRate || 0) >= 5 ? 'MAX' : costFireRate + ' 💰';
+            btnFireRate.disabled = (upgrades.fireRate || 0) >= 5 || state.coins < costFireRate;
 
             const costSpeed = 40 + upgrades.speed * 30;
             const btnSpeed = document.getElementById('btn-buy-speed');
@@ -677,7 +677,7 @@
         window.buyUpgrade = function(type, baseCost) {
             let cost = 0;
             if (type === 'lives') cost = 50 + upgrades.lives * 50;
-            if (type === 'magnet') cost = 30 + upgrades.magnet * 20;
+            if (type === 'fireRate') cost = 30 + (upgrades.fireRate || 0) * 20;
             if (type === 'speed') cost = 40 + upgrades.speed * 30;
             if (type === 'energy') cost = 60 + upgrades.energy * 40;
             if (type === 'weapon') cost = 100 + upgrades.weapon * 50;
@@ -845,7 +845,7 @@
                 lasers.push({ el, x: player.x, y: player.y - 40, vx: vx, vy: vy, dmg: finalDmg, w: 4, h: 25 });
             });
 
-            let baseCooldown = 0.34;
+            let baseCooldown = 0.68 / (1 + 0.05 * (upgrades.fireRate || 0));
             if (player.fireRateTimer > 0) baseCooldown /= 2;
             player.cooldown = baseCooldown;
         }
