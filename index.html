@@ -836,7 +836,7 @@
 
         </div>
 
-        <button id="shop-close-btn" onclick="closeShop()" style="margin-top: 20px;">BACK TO PAUSE</button>
+        <button id="shop-close-btn" style="margin-top: 20px;">BACK TO PAUSE</button>
     </div>
 
     <div id="start-popup" class="popup" style="display: block; padding: 40px; width: 450px;">
@@ -1183,6 +1183,7 @@
                 pausePopup.style.display = 'block';
             }
         }
+        document.getElementById('shop-close-btn').addEventListener('click', closeShop);
 
         function updateBars(type, level) {
             const container = document.getElementById('bars-' + type);
