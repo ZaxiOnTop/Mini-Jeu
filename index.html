@@ -324,7 +324,7 @@
 
         <div class="hud" id="score-container">
             <div id="score">SCORE: 0</div>
-            <div id="best-score" style="color: #0ff; font-size: 12px;">HI-SCORE: 0</div>
+            <div id="best-score" style="color: #0ff; font-size: 12px;">HIGHEST SCORE: 0</div>
         </div>
 
         <div class="hud" id="lives-container">
@@ -489,7 +489,7 @@
         const levelTransitionPopup = document.getElementById('level-transition');
         const levelText = document.getElementById('level-text');
 
-        bestScoreEl.textContent = 'HI-SCORE: ' + state.bestScore;
+        bestScoreEl.textContent = 'HIGHEST SCORE: ' + state.bestScore;
         coinsHudEl.textContent = '💰 ' + state.coins;
 
         // Player & Upgrades
