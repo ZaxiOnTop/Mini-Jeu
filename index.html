@@ -384,8 +384,8 @@
                 <button id="btn-buy-fireRate" onclick="buyUpgrade('fireRate', 30)">30 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
-                <span>BASE DAMAGE +</span>
-                <button id="btn-buy-damageUpg" onclick="buyUpgrade('damageUpg', 40)">40 💰</button>
+                <span>WEAPON & DAMAGE +</span>
+                <button id="btn-buy-weapon" onclick="buyUpgrade('weapon', 100)">100 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <span>SHIP SPEED +</span>
@@ -394,10 +394,6 @@
             <div class="shop-item" style="margin-bottom: 0;">
                 <span>ENERGY CHARGE +</span>
                 <button id="btn-buy-energy" onclick="buyUpgrade('energy', 60)">60 💰</button>
-            </div>
-            <div class="shop-item" style="margin-bottom: 0;">
-                <span>WEAPON LEVEL +</span>
-                <button id="btn-buy-weapon" onclick="buyUpgrade('weapon', 100)">100 💰</button>
             </div>
         </div>
 
@@ -477,7 +473,7 @@
         coinsHudEl.textContent = '💰 ' + state.coins;
 
         // Player & Upgrades
-        let upgrades = { lives: 0, fireRate: 0, damageUpg: 0, speed: 0, energy: 0, weapon: 1 };
+        let upgrades = { lives: 0, fireRate: 0, speed: 0, energy: 0, weapon: 1 };
         let inventory = { shield: 0, damage: 0, firerate: 0, homing: 0 };
 
         let player = { 
@@ -569,7 +565,7 @@
             if (e.code === 'ArrowRight') state.keys.ArrowRight = true;
             if (e.code === 'Space') state.keys.Space = true;
             if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
-                if (player.energy >= 100 && !player.isFiringBeam) {
+                if (state.energy >= 100 && !player.isFiringBeam) {
                     fireMegaBeam();
                 }
             }
@@ -649,12 +645,7 @@
             btnFireRate.textContent = (upgrades.fireRate || 0) >= 5 ? 'MAX' : costFireRate + ' 💰';
             btnFireRate.disabled = (upgrades.fireRate || 0) >= 5 || state.coins < costFireRate;
 
-            const costDamageUpg = 40 + (upgrades.damageUpg || 0) * 30;
-            const btnDamageUpg = document.getElementById('btn-buy-damageUpg');
-            if (btnDamageUpg) {
-                btnDamageUpg.textContent = (upgrades.damageUpg || 0) >= 5 ? 'MAX' : costDamageUpg + ' 💰';
-                btnDamageUpg.disabled = (upgrades.damageUpg || 0) >= 5 || state.coins < costDamageUpg;
-            }
+
 
             const costSpeed = 40 + upgrades.speed * 30;
             const btnSpeed = document.getElementById('btn-buy-speed');
@@ -691,7 +682,6 @@
             let cost = 0;
             if (type === 'lives') cost = 50 + upgrades.lives * 50;
             if (type === 'fireRate') cost = 30 + (upgrades.fireRate || 0) * 20;
-            if (type === 'damageUpg') cost = 40 + (upgrades.damageUpg || 0) * 30;
             if (type === 'speed') cost = 40 + upgrades.speed * 30;
             if (type === 'energy') cost = 60 + upgrades.energy * 40;
             if (type === 'weapon') cost = 100 + upgrades.weapon * 50;
@@ -840,7 +830,7 @@
             if (state.isPaused || state.isGameOver || state.transitioning || player.cooldown > 0 || player.isFiringBeam) return;
             
             const config = getWeaponConfig(player.weaponLevel);
-            let finalDmg = (config.dmg + (upgrades.damageUpg || 0) * 0.5) * (player.dmgBoostTimer > 0 ? 2 : 1);
+            let finalDmg = config.dmg * (player.dmgBoostTimer > 0 ? 2 : 1);
 
             config.angles.forEach(angle => {
                 const el = document.createElement('div');
