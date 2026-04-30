@@ -477,8 +477,8 @@
             inShop: false,
             isGameOver: false,
             bossActive: false,
-            bossMaxLife: 100,
-            bossLife: 100,
+            bossMaxLife: 80,
+            bossLife: 80,
             lastFrameTime: 0,
             slowTimeRemaining: 0, // In seconds
             energy: 0,
@@ -858,7 +858,7 @@
         function spawnBoss() {
             state.bossActive = true;
             bossLifeContainer.style.display = 'block';
-            state.bossMaxLife = 100 + (state.level - 1) * 50;
+            state.bossMaxLife = 80 + (state.level - 1) * 50;
             state.bossLife = state.bossMaxLife;
             updateBossLife();
 
@@ -1088,7 +1088,7 @@
                     let hitBoss = false;
                     enemies.forEach((e, i) => {
                         if (e.x > player.x - 30 && e.x < player.x + 30 && e.y < player.y) {
-                            e.hp -= 20 * dt; // 20 damage per second
+                            e.hp -= 14 * dt; // 14 damage per second (reduced by 30%)
                             if (e.hp <= 0) {
                                 createExplosion(e.x, e.y, '#ff0'); state.coins += (e.type || 1); updateCoinsHud();
                                 e.el.remove(); enemies.splice(i, 1);
@@ -1098,7 +1098,7 @@
                         }
                     });
                     if (state.bossActive && boss && boss.x > player.x - 60 && boss.x < player.x + 60 && boss.y < player.y) {
-                        state.bossLife -= 30 * dt; updateBossLife();
+                        state.bossLife -= 21 * dt; updateBossLife();
                         boss.el.style.filter = `hue-rotate(${((state.level-1)*75)%360}deg) brightness(2)`;
                         setTimeout(() => { if(boss && boss.el) boss.el.style.filter = `hue-rotate(${((state.level-1)*75)%360}deg)`; }, 100);
                         if (state.bossLife <= 0) killBoss();
