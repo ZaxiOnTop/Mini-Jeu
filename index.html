@@ -826,14 +826,8 @@
         <p id="end-message" style="font-size: 32px; margin-bottom: 5px;"></p>
         <p id="end-score" style="font-size: 20px; color: #0ff; margin-bottom: 5px;"></p>
 
-        <div id="nickname-section" style="margin-bottom: 20px;">
-            <p style="font-size: 12px; color: #aaa; margin-bottom: 8px;">ENTER YOUR NICKNAME TO SAVE YOUR SCORE</p>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <input type="text" id="player-nickname" placeholder="PILOT" maxlength="12"
-                    style="background: rgba(255,255,255,0.1); border: 2px solid #0ff; color: #fff; padding: 8px 12px; border-radius: 5px; font-family: 'Courier New', Courier, monospace; text-align: center; width: 150px; outline: none;">
-                <button id="btn-submit-score"
-                    style="margin: 0; padding: 8px 15px; font-size: 12px; background: #0ff; color: #000; font-weight: bold; border-radius: 5px;">VALIDATE</button>
-            </div>
+        <div id="nickname-section" style="display: none; margin-bottom: 20px;">
+            <p style="font-size: 12px; color: #aaa; margin-bottom: 8px;">SAVING SCORE...</p>
         </div>
 
         <p id="run-rank" style="font-size: 14px; color: #ffdf00; margin-bottom: 15px; font-weight: bold;"></p>
@@ -1440,24 +1434,27 @@
 
         async function updateLeaderboard(currentScore) {
             const syncStatus = document.getElementById('sync-status');
-            const nicknameInput = document.getElementById('player-nickname');
-            const submitBtn = document.getElementById('btn-submit-score');
             const nicknameSection = document.getElementById('nickname-section');
-
-            // Pré-remplir avec le dernier pseudo utilisé
-            nicknameInput.value = localStorage.getItem('spaceInvadersNickname') || "";
-
+            const currentName = localStorage.getItem('spaceInvadersNickname') || "PILOT";
+            
+            nicknameSection.style.display = 'block';
+            nicknameSection.innerHTML = `<p style="font-size: 12px; color: #aaa;">SAVING SCORE FOR <b>${currentName}</b>...</p>`;
+            
             let currentRunId = Date.now().toString();
             let leaderboard = [];
 
-            // 1. Charger les scores (Firebase ou Local)
+            // 1. Sauvegarde automatique et Chargement
             if (db) {
                 syncStatus.textContent = "SYNCING...";
-                
-                // On crée une promesse qui expire après 3 secondes
                 const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000));
                 
                 try {
+                    // Envoi automatique
+                    const newRef = db.ref('scores').push();
+                    await Promise.race([newRef.set({ name: currentName, score: currentScore, date: Date.now() }), timeout]);
+                    currentRunId = newRef.key;
+
+                    // Récupération du Top 50
                     const fetchScores = db.ref('scores').orderByChild('score').limitToLast(50).once('value');
                     const snapshot = await Promise.race([fetchScores, timeout]);
                     
@@ -1466,13 +1463,14 @@
                         leaderboard = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                     }
                     syncStatus.textContent = "GLOBAL ONLINE";
+                    nicknameSection.style.display = 'none';
                 } catch (e) {
-                    console.error("Firebase Error or Timeout:", e);
-                    syncStatus.textContent = "LOCAL MODE (TIMEOUT)";
+                    console.error("Firebase Error:", e);
+                    syncStatus.textContent = "LOCAL MODE (OFFLINE)";
+                    nicknameSection.innerHTML = `<p style="font-size: 12px; color: #f44;">OFFLINE - SCORE SAVED LOCALLY</p>`;
                 }
             }
-
-            // Fallback local si Firebase vide ou échoue
+            
             if (leaderboard.length === 0) {
                 leaderboard = JSON.parse(localStorage.getItem('spaceInvadersLeaderboard')) || [
                     { id: '1', name: "X-WING", score: 50000 },
@@ -1481,36 +1479,18 @@
                     { id: '4', name: "DROID", score: 15000 },
                     { id: '5', name: "REBEL", score: 8000 }
                 ];
+                if (!db) {
+                    leaderboard.push({ id: currentRunId, name: currentName, score: currentScore });
+                    leaderboard.sort((a, b) => b.score - a.score);
+                    localStorage.setItem('spaceInvadersLeaderboard', JSON.stringify(leaderboard.slice(0, 50)));
+                    nicknameSection.style.display = 'none';
+                }
             }
 
             leaderboard.sort((a, b) => b.score - a.score);
-            updateLeaderboardUI(leaderboard);
-
-            // Gestion du bouton Valider
-            submitBtn.onclick = async () => {
-                const name = nicknameInput.value.trim().toUpperCase() || "PILOT";
-                localStorage.setItem('spaceInvadersNickname', name);
-                nicknameSection.style.display = 'none';
-
-                if (db) {
-                    const newRef = db.ref('scores').push();
-                    await newRef.set({ name: name, score: currentScore, date: Date.now() });
-                    currentRunId = newRef.key;
-                    // Recharger après envoi
-                    const snapshot = await db.ref('scores').orderByChild('score').limitToLast(50).once('value');
-                    const data = snapshot.val();
-                    leaderboard = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                } else {
-                    leaderboard.push({ id: currentRunId, name: name, score: currentScore });
-                    const saveList = leaderboard.map(e => ({ name: e.name, score: e.score })).slice(0, 50);
-                    localStorage.setItem('spaceInvadersLeaderboard', JSON.stringify(saveList));
-                }
-
-                leaderboard.sort((a, b) => b.score - a.score);
-                const rank = leaderboard.findIndex(e => e.id === currentRunId) + 1;
-                document.getElementById('run-rank').textContent = `YOUR WORLD RANK: #${rank}`;
-                updateLeaderboardUI(leaderboard, currentRunId);
-            };
+            const rank = leaderboard.findIndex(e => e.id === currentRunId) + 1;
+            document.getElementById('run-rank').textContent = `YOUR WORLD RANK: #${rank}`;
+            updateLeaderboardUI(leaderboard, currentRunId);
         }
 
         function endGame(win) {
