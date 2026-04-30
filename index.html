@@ -1332,9 +1332,11 @@
         const ENEMY_TYPES = {
             SCOUT: { hp: 1, speed: 0.7, fireRate: 0.005, score: 10, filter: 'none', coins: 1 },
             INTERCEPTOR: { hp: 1, speed: 1.2, fireRate: 0.008, score: 25, filter: 'hue-rotate(120deg) brightness(1.2)', zigZag: true, coins: 2 },
-            TANK: { hp: 5, speed: 0.5, fireRate: 0.012, score: 60, filter: 'hue-rotate(300deg) saturate(2)', size: 60, coins: 5 },
+            TANK: { hp: 5, speed: 0.5, fireRate: 0.012, score: 60, filter: 'hue-rotate(300deg) saturate(2)', size: 60, coins: 5 }, 
             KAMIKAZE: { hp: 1, speed: 3.2, fireRate: 0, score: 30, filter: 'hue-rotate(45deg) saturate(3) contrast(1.5)', dash: true, coins: 3 },
-            ASTEROID: { hp: 10, speed: 1.2, fireRate: 0, score: 5, filter: 'grayscale(1) brightness(0.7)', size: 80, isHazard: true, coins: 10 }
+            ASTEROID: { hp: 10, speed: 1.2, fireRate: 0, score: 5, filter: 'grayscale(1) brightness(0.7)', size: 80, isHazard: true, coins: 10 },
+            CARGO: { hp: 1, speed: 2.5, fireRate: 0, score: 100, filter: 'sepia(1) saturate(10) brightness(1.2)', horizontal: true, coins: 10, size: 50 },
+            SUPER_CARGO: { hp: 2, speed: 3.0, fireRate: 0, score: 500, filter: 'brightness(3) saturate(0) contrast(2)', horizontal: true, coins: 50, size: 65 }
         };
 
         function spawnEnemy(typeKey = 'SCOUT', customX = null, customY = -60) {
@@ -1354,16 +1356,28 @@
             el.appendChild(img);
             container.appendChild(el);
 
-            // Spawn plus centré (entre 15% et 85% de la largeur)
-            const margin = window.innerWidth * 0.15;
-            const x = customX !== null ? customX : margin + Math.random() * (window.innerWidth - margin * 2);
+            let x = customX !== null ? customX : 50 + Math.random() * (window.innerWidth - 100);
+            let y = customY;
+            let vx = 0;
+            let vy = (110 + (state.level * 12)) * config.speed;
+
+            if (config.horizontal) {
+                const fromLeft = Math.random() > 0.5;
+                x = fromLeft ? -60 : window.innerWidth + 60;
+                y = 80 + Math.random() * 100;
+                vx = fromLeft ? 250 : -250;
+                vy = 0;
+            } else if (customX === null) {
+                const margin = window.innerWidth * 0.15;
+                x = margin + Math.random() * (window.innerWidth - margin * 2);
+            }
             
             enemies.push({
-                el, x, y: customY,
+                el, x, y, vx, vy,
                 type: typeKey,
                 hp: config.hp,
                 maxHp: config.hp,
-                speed: (110 + (state.level * 12)) * config.speed, // Vitesse plus douce
+                speed: vy || Math.abs(vx),
                 width: size, height: size,
                 baseX: x,
                 zigZagOffset: Math.random() * Math.PI * 2,
@@ -1387,9 +1401,13 @@
             if (level >= 5 && r > 0.85) type = 'TANK';
             if (level >= 7 && r > 0.9) type = 'KAMIKAZE';
             if (level >= 4 && Math.random() < 0.05) type = 'ASTEROID';
+            
+            const cargoRoll = Math.random();
+            if (cargoRoll < 0.01) type = 'SUPER_CARGO'; // 1% Super Cargo
+            else if (cargoRoll < 0.06) type = 'CARGO'; // 5% Cargo Classique (0.01 + 0.05)
 
-            // Formations (Escadrilles) : Uniquement à partir du Niveau 2
-            const canSpawnFormation = level >= 2 && type !== 'TANK' && type !== 'ASTEROID' && enemies.length < (maxEnemies - 3);
+            // Formations (Escadrilles)
+            const canSpawnFormation = level >= 2 && type !== 'TANK' && type !== 'ASTEROID' && type !== 'CARGO' && type !== 'SUPER_CARGO' && enemies.length < (maxEnemies - 3);
             
             if (Math.random() < 0.3 && canSpawnFormation) {
                 const count = level >= 5 ? 4 : 3; // Petites vagues au début
@@ -1408,20 +1426,24 @@
             enemyLasers.push({ el, x: enemy.x, y: enemy.y + 25, speed: laserSpeed, w: 4, h: 15, damage: 1 });
         }
 
-        const powerupTypes = ['health'];
-        const powerupIcons = { 'health': '♥' };
+        const powerupTypes = ['health', 'weapon', 'time', 'shield', 'damage', 'firerate', 'homing'];
+        const consumableTypes = ['health', 'time', 'shield', 'damage', 'firerate', 'homing'];
+        const powerupIcons = { 'health': '♥', 'weapon': '🔫', 'time': '⌛', 'shield': '🛡️', 'damage': '💥', 'firerate': '⚡', 'homing': '🎯' };
 
-        function spawnPowerup() {
-            if (state.transitioning || player.lives >= player.maxLives) return;
-            const type = powerupTypes[Math.floor(Math.random() * powerupTypes.length)];
-
+        function spawnPowerup(x, y, onlyConsumables = false, specificType = null) {
+            const list = onlyConsumables ? consumableTypes : powerupTypes;
+            const type = specificType || list[Math.floor(Math.random() * list.length)];
             const el = document.createElement('div');
             el.className = 'powerup powerup-' + type;
-            el.textContent = powerupIcons[type];
+            
+            if (type === 'health') {
+                el.innerHTML = '<span class="heart full" style="font-size: 20px;"></span>';
+            } else {
+                el.textContent = powerupIcons[type];
+            }
+            
             container.appendChild(el);
-
-            const x = 50 + Math.random() * (window.innerWidth - 100);
-            powerups.push({ el, x, y: -50, speed: 120, type: type });
+            powerups.push({ el, x, y, speed: 120, type: type });
         }
 
 
@@ -1767,10 +1789,17 @@
                             e.hp -= 14 * dt; // 14 damage per second (reduced by 30%)
                             if (e.hp <= 0) {
                                 createExplosion(e.x, e.y, '#ff0'); 
-                                const val = ENEMY_TYPES[e.type]?.coins || 1;
-                                addCoins(val);
+                                const config = ENEMY_TYPES[e.type];
+                                if (e.type === 'CARGO') spawnPowerup(e.x, e.y, true);
+                                else if (e.type === 'SUPER_CARGO') {
+                                    consumableTypes.forEach((t, idx) => {
+                                        setTimeout(() => spawnPowerup(e.x, e.y, true, t), idx * 100);
+                                    });
+                                }
+                                
+                                addCoins(config?.coins || 1);
                                 e.el.remove(); enemies.splice(i, 1);
-                                addScore(ENEMY_TYPES[e.type]?.score || 10); 
+                                addScore(config?.score || 10); 
                                 state.enemiesKilledThisLevel++;
                                 scoreEl.textContent = 'SCORE: ' + state.score;
                             }
@@ -1820,10 +1849,14 @@
                     nextSpawnInterval = Math.max(700, 2500 - (state.level * 150));
                 }
             }
+            // Powerups (On enlève le spawn aléatoire pour privilégier le Cargo)
+            /* 
             powerupTimer += gameDt * 1000;
             if (powerupTimer > nextPowerup) {
-                spawnPowerup(); powerupTimer = 0; nextPowerup = 15000 + Math.random() * 10000;
+                spawnPowerup(50 + Math.random() * (window.innerWidth - 100), -50); 
+                powerupTimer = 0; nextPowerup = 20000 + Math.random() * 15000;
             }
+            */
 
             // Powerups
             for (let i = powerups.length - 1; i >= 0; i--) {
@@ -1859,9 +1892,11 @@
                 // Mouvements spéciaux
                 if (config.zigZag) {
                     e.x = e.baseX + Math.sin(timestamp / 300 + e.zigZagOffset) * 120;
+                } else if (config.horizontal) {
+                    e.x += e.vx * gameDt;
                 }
                 
-                e.y += e.speed * gameDt;
+                e.y += (e.vy || 0) * gameDt;
                 e.el.style.left = e.x + 'px'; e.el.style.top = e.y + 'px';
 
                 // Tir aléatoire
@@ -1875,11 +1910,10 @@
                         e.el.remove(); enemies.splice(i, 1); 
                     }
                 } else if (e.y > window.innerHeight + 100) { 
-                    // Pénalité : Si un ennemi s'échappe, on perd de l'énergie (pression temporelle)
-                    if (e.type !== 'ASTEROID') {
+                    // Pénalité : Uniquement si l'énergie n'est pas encore à 100%
+                    if (e.type !== 'ASTEROID' && state.energy < 100) {
                         state.energy = Math.max(0, state.energy - 5);
                         energyFill.style.width = state.energy + '%';
-                        // Feedback visuel de perte
                         energyFill.style.backgroundColor = '#f00';
                         setTimeout(() => energyFill.style.backgroundColor = '', 200);
                     }
@@ -1962,15 +1996,22 @@
                         e.hp -= l.dmg;
                         if (e.hp <= 0) {
                             createExplosion(e.x, e.y, '#ff0');
-                            const val = ENEMY_TYPES[e.type]?.coins || 1;
-                            addCoins(val);
+                            const config = ENEMY_TYPES[e.type];
+                            if (e.type === 'CARGO') spawnPowerup(e.x, e.y, true);
+                            else if (e.type === 'SUPER_CARGO') {
+                                consumableTypes.forEach((t, idx) => {
+                                    setTimeout(() => spawnPowerup(e.x, e.y, true, t), idx * 100);
+                                });
+                            }
+
+                            addCoins(config?.coins || 1);
                             e.el.remove(); enemies.splice(j, 1);
-                            addScore(ENEMY_TYPES[e.type]?.score || 10); 
+                            addScore(config?.score || 10); 
                             state.enemiesKilledThisLevel++;
                             scoreEl.textContent = 'SCORE: ' + state.score;
 
                             // Gain energy on kill
-                            if (!player.isFiringBeam) state.energy = Math.min(100, state.energy + 1);
+                            if (!player.isFiringBeam) state.energy = Math.min(100, state.energy + 1.5);
 
                             if (state.enemiesKilledThisLevel >= 20 && !state.bossActive) spawnBoss();
                         } else {
