@@ -477,8 +477,8 @@
             inShop: false,
             isGameOver: false,
             bossActive: false,
-            bossMaxLife: 80,
-            bossLife: 80,
+            bossMaxLife: 70,
+            bossLife: 70,
             lastFrameTime: 0,
             slowTimeRemaining: 0, // In seconds
             energy: 0,
@@ -858,7 +858,7 @@
         function spawnBoss() {
             state.bossActive = true;
             bossLifeContainer.style.display = 'block';
-            state.bossMaxLife = 80 + (state.level - 1) * 50;
+            state.bossMaxLife = 70 + (state.level - 1) * 50;
             state.bossLife = state.bossMaxLife;
             updateBossLife();
 
