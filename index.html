@@ -1627,9 +1627,13 @@
                 div.style.padding = '8px 10px';
                 div.style.borderBottom = '1px solid #333';
                 if (isCurrent) div.style.background = 'rgba(255, 223, 0, 0.2)';
+                
+                // Si le niveau est manquant (vieux scores), on l'estime
+                const displayLevel = entry.level || Math.max(1, Math.floor(entry.score / 1500));
+
                 div.innerHTML = `
                     <span style="color: ${i < 3 ? '#ffdf00' : '#fff'}; font-size: 12px;">#${i + 1} ${entry.name}</span>
-                    <span style="color: #0ff; font-size: 12px;">LVL ${entry.level || '?'} • ${entry.score.toLocaleString()}</span>
+                    <span style="color: #0ff; font-size: 12px;">LEVEL ${displayLevel} • ${entry.score.toLocaleString()}</span>
                 `;
                 listEl.appendChild(div);
             });
