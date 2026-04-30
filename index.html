@@ -937,15 +937,31 @@
             if (!boss || state.isPaused || state.isGameOver || state.transitioning) return;
             const laserSpeed = 255 + (state.level - 1) * 25.5;
 
-            if (phase === 1) {
+            // Use level 1 (single laser) if below level 10
+            const actualPhase = state.level < 10 ? 1 : phase;
+
+            if (actualPhase === 1) {
                 const el = document.createElement('div'); el.className = 'big-enemy-laser'; container.appendChild(el);
-                enemyLasers.push({ el, x: boss.x, y: boss.y + 50, speed: laserSpeed, w: 6, h: 35 });
-            } else if (phase === 2) {
+                let vx = 0;
+                let vy = laserSpeed;
+                
+                if (state.level >= 3) {
+                    // Slight homing effect at spawn
+                    const targetAngle = Math.atan2(player.x - boss.x, player.y - (boss.y + 50));
+                    const maxAngle = 35 * Math.PI / 180;
+                    const angle = Math.max(-maxAngle, Math.min(maxAngle, targetAngle));
+                    vx = Math.sin(angle) * laserSpeed;
+                    vy = Math.cos(angle) * laserSpeed;
+                    if (angle !== 0) el.style.transform = `translateX(-50%) rotate(${-angle * 180 / Math.PI}deg)`;
+                }
+                
+                enemyLasers.push({ el, x: boss.x, y: boss.y + 50, speed: laserSpeed, w: 6, h: 35, vx, vy });
+            } else if (actualPhase === 2) {
                 const el1 = document.createElement('div'); el1.className = 'big-enemy-laser'; container.appendChild(el1);
                 const el2 = document.createElement('div'); el2.className = 'big-enemy-laser'; container.appendChild(el2);
                 enemyLasers.push({ el: el1, x: boss.x - 30, y: boss.y + 50, speed: laserSpeed, w: 6, h: 35 });
                 enemyLasers.push({ el: el2, x: boss.x + 30, y: boss.y + 50, speed: laserSpeed, w: 6, h: 35 });
-            } else if (phase === 3) {
+            } else if (actualPhase === 3) {
                 const angles = [0, -20, 20];
                 angles.forEach(angle => {
                     const el = document.createElement('div'); el.className = 'big-enemy-laser';
@@ -954,8 +970,7 @@
                     const rad = angle * Math.PI / 180;
                     const vx = Math.sin(rad) * laserSpeed;
                     const vy = Math.cos(rad) * laserSpeed;
-                    // For angled enemy lasers, vy is positive (moves down), vx pushes horizontally
-                    enemyLasers.push({ el, x: boss.x, y: boss.y + 50, speed: laserSpeed, w: 6, h: 35, vx: vx, vy: vy });
+                    enemyLasers.push({ el, x: boss.x, y: boss.y + 50, speed: laserSpeed, w: 6, h: 35, vx, vy });
                 });
             }
         }
@@ -1179,9 +1194,9 @@
                 boss.el.style.left = boss.x + 'px'; boss.el.style.top = boss.y + 'px';
 
                 boss.shootTimer += gameDt;
-                let shootInterval = Math.max(0.345, 0.92 - (state.level - 1) * 0.115);
+                let shootInterval = 1.15 / (1 + 0.05 * (state.level - 1));
 
-                let attackLevel = Math.min(3, Math.ceil(state.level / 2));
+                let attackLevel = state.level >= 10 ? Math.min(3, Math.ceil(state.level / 2)) : 1;
                 if (boss.shootTimer > shootInterval) { bossShoot(attackLevel); boss.shootTimer = 0; }
                 
                 if (checkCollision(player.x, player.y, 40, 40, boss.x, boss.y, 100, 100)) hitPlayer();
@@ -1203,11 +1218,17 @@
                         let speed = Math.sqrt(l.vx*l.vx + l.vy*l.vy);
                         let steer = 8 * dt; // Steer strength
                         l.vx += ((dx/dist)*speed - l.vx) * steer;
-                        l.vy += (-(dy/dist)*speed - l.vy) * steer; // note: vy is negative to go up in visual math
+                        l.vy += (-(dy/dist)*speed - l.vy) * steer;
+
+                        // Clamp total angle to 35 degrees relative to straight up
+                        let angleRad = Math.atan2(l.vx, l.vy);
+                        const maxAngle = 35 * Math.PI / 180;
+                        angleRad = Math.max(-maxAngle, Math.min(maxAngle, angleRad));
                         
-                        // Update visual rotation
-                        let angle = Math.atan2(l.vx, l.vy) * 180 / Math.PI;
-                        l.el.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+                        l.vx = Math.sin(angleRad) * speed;
+                        l.vy = Math.cos(angleRad) * speed;
+                        
+                        l.el.style.transform = `translateX(-50%) rotate(${angleRad * 180 / Math.PI}deg)`;
                     }
                 }
 
