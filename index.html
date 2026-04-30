@@ -1,596 +1,1069 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Invaders Remake</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-      body {
-          background-color: black;
-          background-image: url(/Image/night-sky-with-stars-sparkling-black-background_987686-453.avif); /* Remplace par le chemin de ton image */
-           background-size: cover; /* Couvre tout l'écran */
-          background-repeat: no-repeat; /* Pas de répétition de l'image */
-          margin: 0;
-          overflow: hidden;
-      }
-    
-      #spaceship {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-          width: 50px;
-          height: 50px;
-          position: absolute;
-          bottom: 0;
-      }
+        body {
+            background-color: black;
+            background-image: url('Image/night-sky-with-stars-sparkling-black-background_987686-453.avif');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Press Start 2P', cursive;
+            color: white;
+            user-select: none;
+        }
 
-      #spaceship img {
-    width: 145%;
-    height: 145%;
-    object-fit: cover;
-    display: block; /* Assurez-vous que l'image est bien en mode bloc pour éviter l'invisibilité */
-}
-    
-      .enemy {
-          width: 50px;
-          height: 50px;
-          position: absolute;
-          top: 0;
-      }
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
 
-      @keyframes enemy-shake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-5px);
-  }
-  75% {
-    transform: translateX(5px);
-  }
-}
+        #spaceship {
+            width: 60px;
+            height: 60px;
+            position: absolute;
+            bottom: 20px;
+            transform: translateX(-50%);
+            z-index: 10;
+            transition: filter 0.2s;
+        }
 
-.enemy {
-  animation: enemy-shake 0.8s infinite; /* Les ennemis tremblent en permanence */
-}
+        #spaceship img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+            animation: float 2s ease-in-out infinite;
+        }
 
-    
-      .big-enemy {
-          width: 100px;
-          height: 100px;
-          position: absolute;
-          top: 0;
-      }
-    
-      .laser {
-          width: 5px;
-          height: 20px;
-          background-color: yellow;
-          position: absolute;
-      }
-    
-      .big-enemy-laser {
-          width: 5px;
-          height: 20px;
-          background-color: orange;
-          position: absolute;
-      }
-    
-      #score {
-          color: white;
-          font-size: 24px;
-          position: absolute;
-          top: 10px; /* Positionne le score en haut à gauche */
-          left: 10px;
-          z-index: 100;
-      }
-    
-      #best-score {
-          color: white;
-          font-size: 24px;
-          position: absolute;
-          top: 40px; /* Positionne le meilleur score sous le score */
-          left: 10px;
-          z-index: 100;
-      }
-    
-      #timer {
-          color: white;
-          font-size: 24px;
-          position: absolute;
-          top: 10px; /* Positionne le timer en haut à droite */
-          right: 10px;
-          z-index: 100;
-      }
-    
-      #boss-life {
-          display: none;
-          color: white;
-          font-size: 24px;
-          position: absolute;
-          top: 70px;
-          left: 10px;
-      }
-    
-      /* Popup styling */
-      #pause-popup {
-          display: none;
-          position: fixed;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background-color: white;
-          color: black;
-          padding: 20px;
-          text-align: center;
-          border-radius: 10px;
-          z-index: 1000;
-      }
-    
-      #pause-popup button {
-          margin: 5px;
-          padding: 10px 20px;
-          font-size: 16px;
-      }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
 
+        .enemy {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            transform: translateX(-50%);
+            z-index: 5;
+        }
 
-      /* Popup styling */
-      #end-popup {
+        .enemy img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            animation: enemy-shake 0.8s infinite;
+        }
+
+        /* Enemy Types styling using Hue Rotation on the base image */
+        .enemy-type-1 img {
+            filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.8));
+        }
+        
+        .enemy-type-2 img {
+            /* Shooter */
+            filter: hue-rotate(180deg) drop-shadow(0 0 10px #f00);
+        }
+
+        .enemy-type-3 img {
+            /* Zigzag */
+            filter: hue-rotate(90deg) drop-shadow(0 0 10px #ff0);
+        }
+
+        .enemy-type-4 {
+            /* Tank */
+            width: 65px;
+            height: 65px;
+        }
+        .enemy-type-4 img {
+            filter: hue-rotate(270deg) drop-shadow(0 0 15px #f0f);
+        }
+
+        @keyframes enemy-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            75% { transform: translateX(3px); }
+        }
+
+        .big-enemy {
+            width: 150px;
+            height: 150px;
+            position: absolute;
+            transform: translateX(-50%);
+            z-index: 6;
+            filter: drop-shadow(0 0 20px rgba(255, 0, 255, 0.6));
+        }
+
+        .big-enemy img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .laser {
+            width: 4px;
+            height: 25px;
+            position: absolute;
+            transform: translateX(-50%);
+            border-radius: 2px;
+            z-index: 4;
+        }
+
+        .enemy-laser {
+            width: 4px;
+            height: 15px;
+            background-color: #f00;
+            position: absolute;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px #f00;
+            border-radius: 2px;
+            z-index: 4;
+        }
+
+        .big-enemy-laser {
+            width: 6px;
+            height: 35px;
+            background-color: #f0f;
+            position: absolute;
+            transform: translateX(-50%);
+            box-shadow: 0 0 15px #f0f, 0 0 30px #f0f;
+            border-radius: 3px;
+            z-index: 4;
+        }
+
+        .powerup {
+            position: absolute;
+            font-size: 24px;
+            transform: translateX(-50%);
+            z-index: 8;
+        }
+
+        .powerup-health {
+            color: #f00;
+            text-shadow: 0 0 10px #f00, 0 0 20px #fff;
+            animation: pulse-powerup-health 1s infinite alternate;
+        }
+
+        .powerup-weapon {
+            color: #0ff;
+            text-shadow: 0 0 10px #0ff, 0 0 20px #fff;
+            animation: pulse-powerup-weapon 0.5s infinite alternate;
+        }
+
+        @keyframes pulse-powerup-health {
+            from { transform: translateX(-50%) scale(1); }
+            to { transform: translateX(-50%) scale(1.3); }
+        }
+
+        @keyframes pulse-powerup-weapon {
+            from { transform: translateX(-50%) scale(1); }
+            to { transform: translateX(-50%) scale(1.4) rotate(15deg); }
+        }
+
+        .hud {
+            position: absolute;
+            top: 20px;
+            font-size: 16px;
+            z-index: 100;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        #score-container {
+            left: 20px;
+        }
+
+        #lives-container {
+            left: 20px;
+            top: 60px;
+            color: #f00;
+            font-size: 20px;
+        }
+
+        #timer-container {
+            right: 20px;
+            text-align: right;
+        }
+
+        #level-container {
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .hud div {
+            margin-bottom: 12px;
+        }
+
+        #boss-life-container {
+            display: none;
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            text-align: center;
+            z-index: 100;
+        }
+
+        #boss-life-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(50, 50, 50, 0.8);
+            border: 3px solid #fff;
+            margin-top: 10px;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        #boss-life-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #f00, #f0f);
+            transition: width 0.2s, background 0.3s;
+        }
+
+        /* Popups */
+        .popup {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: rgba(255, 255, 255, 0.9);
-            color: black;
-            padding: 20px;
+            background: rgba(10, 10, 20, 0.95);
+            border: 4px solid #fff;
+            padding: 40px;
             text-align: center;
-            border-radius: 10px;
             z-index: 1000;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
         }
 
-        #end-popup button {
-            margin: 5px;
-            padding: 10px 20px;
-            font-size: 16px;
+        .popup p {
+            font-size: 24px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            text-shadow: 2px 2px 0 #f0f;
         }
-    
-      /* Dark overlay behind popup */
-      #overlay {
-          display: none;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-color: rgba(0, 0, 0, 0.5);
-          z-index: 999;
-      }
 
-      @keyframes laser-glow {
-  0%, 100% {
-    box-shadow: 0 0 5px yellow;
-  }
-  50% {
-    box-shadow: 0 0 15px yellow;
-  }
-}
+        .popup button {
+            background: transparent;
+            color: #fff;
+            border: 3px solid #fff;
+            padding: 15px 25px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.2s;
+            border-radius: 5px;
+        }
 
-.laser {
-  animation: laser-glow 0.5s infinite;
-}
+        .popup button:hover {
+            background: #fff;
+            color: #000;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #fff;
+        }
 
-@keyframes spaceship-pulse {
-  0%, 100% {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-  50% {
-    transform: scale(1.1);
-    filter: brightness(1.5);
-  }
-}
+        #level-transition {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            animation: pulse-level 1s infinite alternate;
+            pointer-events: none;
+        }
 
-#spaceship img {
-  animation: spaceship-pulse 1.5s infinite;
-}
+        #level-transition p {
+            font-size: 48px;
+            color: #ff0;
+            text-shadow: 0 0 20px #ff0, 0 0 40px #f00;
+            margin: 0;
+        }
 
+        @keyframes pulse-level {
+            from { transform: translate(-50%, -50%) scale(1); }
+            to { transform: translate(-50%, -50%) scale(1.1); }
+        }
 
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: #ff0;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 7;
+            box-shadow: 0 0 10px currentColor;
+        }
     </style>
-    
-  </head>
-  <body>
-    <div id="spaceship"> <img src="/Image/Spaceship-removebg-preview.png" alt=""></div>
-    
-    <div id="score">Score: 0</div>
-    <div id="best-score">Best Score: 0</div>
-    <div id="timer">Time: 0s</div>
-    <div id="boss-life">Boss Life: 100%</div>
+</head>
+<body>
+    <div id="game-container">
+        <div id="spaceship">
+            <img src="Image/Spaceship-removebg-preview.png" alt="Spaceship">
+        </div>
 
-    <!-- Popup HTML -->
-    <div id="overlay"></div>
-    <div id="pause-popup">
-      <p>Game Paused</p>
-      <button id="resume-button">Resume</button>
-      <button id="restart-button">Restart</button>
+        <div class="hud" id="score-container">
+            <div id="score">SCORE: 0</div>
+            <div id="best-score" style="color: #0ff; font-size: 14px;">HI-SCORE: 0</div>
+        </div>
+
+        <div class="hud" id="lives-container">
+            <div id="lives-hud">♥♥♥</div>
+        </div>
+
+        <div class="hud" id="level-container">
+            <div id="level-hud" style="color: #ff0; text-shadow: 2px 2px 0 #f00;">LEVEL 1</div>
+        </div>
+
+        <div class="hud" id="timer-container">
+            <div id="timer">TIME: 0s</div>
+        </div>
+
+        <div id="boss-life-container">
+            <div style="color: #f0f; text-shadow: 2px 2px 0 #000;">BOSS HP</div>
+            <div id="boss-life-bar">
+                <div id="boss-life-fill"></div>
+            </div>
+        </div>
     </div>
 
-     <!-- Popup de fin de jeu -->
-     <div id="end-popup">
-      <p id="end-message"></p>
-      <button id="newgame-button">New game</button>
-  </div>
+    <div id="overlay"></div>
+    
+    <div id="pause-popup" class="popup">
+        <p>GAME PAUSED</p>
+        <button id="resume-button">RESUME</button>
+        <button id="restart-button">RESTART</button>
+    </div>
+
+    <div id="end-popup" class="popup">
+        <p id="end-message"></p>
+        <p id="end-score" style="font-size: 18px; color: #0ff; margin-bottom: 30px;"></p>
+        <button id="newgame-button">PLAY AGAIN</button>
+    </div>
+
+    <div id="level-transition" class="popup">
+        <p id="level-text">LEVEL 1</p>
+    </div>
 
     <script>
-      const spaceship = document.getElementById('spaceship');
-      let bestScore = localStorage.getItem('bestScore') || 0; // Récupérer le bestScore depuis le stockage local
-      const spaceshipWidth = spaceship.clientWidth;
-      const screenWidth = window.innerWidth;
-      let score = 0;
-      let time = 0;
-      let bossLife = 100;
-      let timerInterval;
-      let gamePaused = false;
+        // Game State
+        const state = {
+            level: 1,
+            enemiesKilledThisLevel: 0,
+            transitioning: false,
+            score: 0,
+            bestScore: parseInt(localStorage.getItem('spaceInvadersBestScore')) || 0,
+            time: 0,
+            gameTimeMs: 0,
+            isPaused: false,
+            isGameOver: false,
+            bossActive: false,
+            bossMaxLife: 100,
+            bossLife: 100,
+            lastFrameTime: 0,
+            keys: { ArrowLeft: false, ArrowRight: false, Space: false }
+        };
 
-      const bossLifeElement = document.getElementById('boss-life');
-      const overlay = document.getElementById('overlay');
-      const pausePopup = document.getElementById('pause-popup');
-      const resumeButton = document.getElementById('resume-button');
-      const restartButton = document.getElementById('restart-button');
+        // DOM Elements
+        const container = document.getElementById('game-container');
+        const spaceship = document.getElementById('spaceship');
+        const scoreEl = document.getElementById('score');
+        const bestScoreEl = document.getElementById('best-score');
+        const levelHudEl = document.getElementById('level-hud');
+        const livesHudEl = document.getElementById('lives-hud');
+        const timerEl = document.getElementById('timer');
+        const bossLifeContainer = document.getElementById('boss-life-container');
+        const bossLifeFill = document.getElementById('boss-life-fill');
+        const overlay = document.getElementById('overlay');
+        const pausePopup = document.getElementById('pause-popup');
+        const endPopup = document.getElementById('end-popup');
+        const endMessage = document.getElementById('end-message');
+        const endScore = document.getElementById('end-score');
+        const levelTransitionPopup = document.getElementById('level-transition');
+        const levelText = document.getElementById('level-text');
 
-      let spaceshipX = screenWidth / 2 - spaceshipWidth / 2;
-      let isMovingLeft = false;
-      let isMovingRight = false;
+        bestScoreEl.textContent = 'HI-SCORE: ' + state.bestScore;
 
-      const enemy1 = document.getElementById('enemy1');
-      const enemy2 = document.getElementById('enemy2');
-      const enemy3 = document.getElementById('enemy3');
+        // Entities
+        let player = { 
+            x: window.innerWidth / 2, 
+            y: window.innerHeight - 50, 
+            speed: 500, 
+            cooldown: 0,
+            lives: 3,
+            invulnerable: 0,
+            weaponLevel: 1 // Starts at level 1, goes up to 5
+        };
+        let enemies = [];
+        let lasers = []; // Player lasers
+        let enemyLasers = [];
+        let particles = [];
+        let powerups = [];
+        let boss = null;
+        let enemySpawnTimer = 0;
+        let nextSpawnInterval = 1500;
+        let powerupHealthTimer = 0;
+        let powerupWeaponTimer = 0;
+        let nextPowerupHealth = 15000 + Math.random() * 10000;
+        let nextPowerupWeapon = 10000 + Math.random() * 10000;
 
-      const enemies = []; // Tableau vide pour les ennemis
+        // Ensure spaceship aligns correctly initially
+        spaceship.style.left = player.x + 'px';
 
-function spawnInitialEnemies() {
-  for (let i = 0; i < 3; i++) { // Crée 3 ennemis
-    const newEnemy = document.createElement('div');
-    newEnemy.className = 'enemy';
-    newEnemy.style.left = Math.random() * (window.innerWidth - 50) + 'px'; // Position aléatoire
-    newEnemy.style.top = '0px'; // Position en haut de l'écran
+        // Update lives display
+        function updateLivesHud() {
+            let hearts = '';
+            for(let i=0; i<player.lives; i++) hearts += '♥';
+            livesHudEl.textContent = hearts;
+        }
 
-    const enemyImage = document.createElement('img');
-        enemyImage.src = '/Image/modele-autocollant-objet-volant-non-identifie-ovni-isole_1308-57963-removebg-preview.png'; // Chemin vers l'image de l'ennemi
-        enemyImage.style.width = '100%'; // S'assure que l'image remplit le div
-        enemyImage.style.height = '100%'; // S'assure que l'image remplit le div
-        enemyImage.alt = 'Enemy'; // Ajoute un texte alternatif pour l'accessibilité
-
-        newEnemy.appendChild(enemyImage); // Ajoute l'image au div de l'ennemi
-    document.body.appendChild(newEnemy);
-    enemies.push(newEnemy); // Ajoute l'ennemi au tableau
-  }
-}
-
-// Appelle la fonction pour spawn les ennemis au démarrage
-spawnInitialEnemies();
-      const enemySpeed = 1.5;
-      const laserSpeed = 5;
-      const bigEnemyLaserSpeed = 1.5;
-
-      let bigEnemyShootCooldown = 0;
-
-      function moveEnemies() {
-        if (!gamePaused) {
-          enemies.forEach((enemy) => {
-            let currentTop = parseInt(enemy.style.top, 10) || 0;
-            enemy.style.top = currentTop + enemySpeed + 'px';
-
-            if (currentTop >= window.innerHeight) {
-              enemy.style.top = '0px';
-              enemy.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+        // Handle hitting player
+        function hitPlayer() {
+            if (player.invulnerable > 0) return false;
+            
+            player.lives--;
+            updateLivesHud();
+            createExplosion(player.x, player.y, '#0ff');
+            
+            if (player.lives <= 0) {
+                spaceship.style.display = 'none';
+                endGame(false);
+            } else {
+                player.invulnerable = 2.0; // 2 seconds of invincibility
             }
-          });
-        }
-        requestAnimationFrame(moveEnemies);
-      }
-
-      function updateSpaceshipPosition() {
-        if (!gamePaused) {
-          if (isMovingLeft) {
-            spaceshipX -= 5;
-          }
-          if (isMovingRight) {
-            spaceshipX += 5;
-          }
-
-          spaceshipX = Math.max(0, spaceshipX);
-          spaceshipX = Math.min(screenWidth - spaceshipWidth, spaceshipX);
-
-          spaceship.style.left = spaceshipX + 'px';
+            return true;
         }
 
-        requestAnimationFrame(updateSpaceshipPosition);
-      }
+        // Input Handling
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Escape') togglePause();
+            if (e.code === 'ArrowLeft') state.keys.ArrowLeft = true;
+            if (e.code === 'ArrowRight') state.keys.ArrowRight = true;
+            if (e.code === 'Space' && !state.keys.Space) {
+                state.keys.Space = true;
+                shootLaser();
+            }
+        });
 
-      function createLaser(x, y) {
-        const laser = document.createElement('div');
-        laser.className = 'laser';
-        laser.style.left = x + 'px';
-        laser.style.top = y + 'px';
-        document.body.appendChild(laser);
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'ArrowLeft') state.keys.ArrowLeft = false;
+            if (e.code === 'ArrowRight') state.keys.ArrowRight = false;
+            if (e.code === 'Space') state.keys.Space = false;
+        });
 
-        function moveLaser() {
-          if (gamePaused) {
-            requestAnimationFrame(moveLaser); // Laisser figé en pause
-            return;
-          }
+        function togglePause() {
+            if (state.isGameOver || state.transitioning) return;
+            state.isPaused = !state.isPaused;
+            overlay.style.display = state.isPaused ? 'block' : 'none';
+            pausePopup.style.display = state.isPaused ? 'block' : 'none';
+            if (!state.isPaused) {
+                state.lastFrameTime = performance.now();
+                requestAnimationFrame(gameLoop);
+            }
+        }
 
-          let currentTop = parseInt(laser.style.top, 10) || 0;
-          laser.style.top = currentTop - laserSpeed + 'px';
+        document.getElementById('resume-button').addEventListener('click', togglePause);
+        document.getElementById('restart-button').addEventListener('click', () => location.reload());
+        document.getElementById('newgame-button').addEventListener('click', () => location.reload());
 
-          if (currentTop <= -20) {
-            document.body.removeChild(laser);
-          } else {
-            enemies.forEach((enemy, enemyIndex) => {
-              if (isColliding(laser, enemy)) {
-                document.body.removeChild(laser);
-                document.body.removeChild(enemy);
-                score += 1;
-                updateScore();
+        function startLevelTransition() {
+            state.transitioning = true;
+            levelText.textContent = 'LEVEL ' + state.level;
+            levelTransitionPopup.style.display = 'block';
+            overlay.style.display = 'block';
+            
+            // Clear entities that shouldn't persist across levels
+            enemyLasers.forEach(l => l.el.remove());
+            enemyLasers = [];
+            lasers.forEach(l => l.el.remove());
+            lasers = [];
+            enemies.forEach(e => e.el.remove());
+            enemies = [];
+            powerups.forEach(p => p.el.remove());
+            powerups = [];
 
-                if (score < 20) {
-                  setTimeout(spawnNewEnemy, 1000, enemyIndex);
-                } else if (score === 20) {
-                  spawnBigEnemy();
+            // Reset player position but KEEP lives and weapon upgrades
+            player.x = window.innerWidth / 2;
+            spaceship.style.left = player.x + 'px';
+            player.invulnerable = 0;
+            spaceship.style.opacity = '1';
+
+            setTimeout(() => {
+                levelTransitionPopup.style.display = 'none';
+                overlay.style.display = 'none';
+                state.transitioning = false;
+                state.enemiesKilledThisLevel = 0;
+                levelHudEl.textContent = 'LEVEL ' + state.level;
+                
+                // Spawn initial enemies for the level
+                for(let i=0; i<3; i++) spawnEnemy();
+                
+                state.lastFrameTime = performance.now();
+                if (!state.isPaused) requestAnimationFrame(gameLoop);
+            }, 2500);
+        }
+
+        function spawnEnemy() {
+            if (state.bossActive || state.transitioning) return;
+            
+            const el = document.createElement('div');
+            const img = document.createElement('img');
+            img.src = 'Image/modele-autocollant-objet-volant-non-identifie-ovni-isole_1308-57963-removebg-preview.png';
+            el.appendChild(img);
+            container.appendChild(el);
+
+            const x = 50 + Math.random() * (window.innerWidth - 100);
+            
+            // Determine Enemy Type based on level
+            let r = Math.random();
+            let type = 1;
+            
+            if (state.level === 2) {
+                if (r > 0.7) type = 2;
+            } else if (state.level === 3) {
+                if (r > 0.8) type = 3;
+                else if (r > 0.5) type = 2;
+            } else if (state.level >= 4) {
+                if (r > 0.8) type = 4;
+                else if (r > 0.6) type = 3;
+                else if (r > 0.4) type = 2;
+            }
+
+            let enemy = { el, type, x, y: -50, speed: 0, hp: 1, maxHp: 1, width: 40, height: 40 };
+
+            // Configure based on type
+            el.className = 'enemy enemy-type-' + type;
+            const baseSpeed = 100 + Math.random() * 50;
+
+            if (type === 1) { // Basic
+                enemy.speed = baseSpeed * (1 + (state.level - 1) * 0.15);
+                enemy.hp = 1;
+            } else if (type === 2) { // Shooter
+                enemy.speed = baseSpeed * 0.8 * (1 + (state.level - 1) * 0.1);
+                enemy.hp = 1;
+                enemy.shootTimer = 0;
+                enemy.nextShoot = 1.5 + Math.random() * 2.0;
+            } else if (type === 3) { // Zigzag
+                enemy.speed = baseSpeed * 0.7 * (1 + (state.level - 1) * 0.1);
+                enemy.hp = 2;
+                enemy.waveTime = Math.random() * 10; // offset
+                enemy.dirX = Math.random() > 0.5 ? 1 : -1;
+            } else if (type === 4) { // Tank
+                enemy.speed = baseSpeed * 0.4 * (1 + (state.level - 1) * 0.05);
+                enemy.hp = 4;
+                enemy.width = 55;
+                enemy.height = 55;
+            }
+
+            enemy.maxHp = enemy.hp;
+            enemies.push(enemy);
+        }
+
+        function enemyShoot(enemy) {
+            const el = document.createElement('div');
+            el.className = 'enemy-laser';
+            container.appendChild(el);
+            
+            const laserSpeed = 300 + (state.level * 20);
+            enemyLasers.push({ el, x: enemy.x, y: enemy.y + 25, speed: laserSpeed, w: 4, h: 15 });
+        }
+
+        function spawnPowerup(type) {
+            if (state.transitioning) return;
+            
+            const el = document.createElement('div');
+            el.className = 'powerup ' + (type === 'health' ? 'powerup-health' : 'powerup-weapon');
+            el.textContent = type === 'health' ? '♥' : '★';
+            container.appendChild(el);
+
+            const x = 50 + Math.random() * (window.innerWidth - 100);
+            powerups.push({ el, x, y: -50, speed: 120, type: type });
+        }
+
+        function spawnBoss() {
+            state.bossActive = true;
+            bossLifeContainer.style.display = 'block';
+            
+            // Difficulty logic: Boss gets stronger and faster each level
+            state.bossMaxLife = 100 + (state.level - 1) * 50;
+            state.bossLife = state.bossMaxLife;
+            updateBossLife();
+
+            const el = document.createElement('div');
+            el.className = 'big-enemy';
+            const img = document.createElement('img');
+            img.src = 'Image/sticker-png-massive-pixel-starship-removebg-preview.png';
+            
+            // Changer la couleur du boss à chaque niveau
+            const hue = ((state.level - 1) * 75) % 360;
+            img.style.filter = `hue-rotate(${hue}deg)`;
+            
+            el.appendChild(img);
+            container.appendChild(el);
+
+            const speedX = 200 + (state.level - 1) * 30;
+
+            boss = {
+                el,
+                x: window.innerWidth / 2,
+                y: 100,
+                speedX: speedX,
+                direction: 1,
+                shootTimer: 0
+            };
+            
+            // Clear regular enemies
+            enemies.forEach(e => e.el.remove());
+            enemies = [];
+        }
+
+        function getWeaponConfig(level) {
+            switch(level) {
+                case 1: return { dmg: 1, color: '#0ff', angles: [0] }; // 1 straight, cyan
+                case 2: return { dmg: 2, color: '#0f0', angles: [0] }; // 1 straight, green
+                case 3: return { dmg: 2, color: '#ff0', angles: [0, -20, 20] }; // 3 spread, yellow
+                case 4: return { dmg: 2, color: '#f90', angles: [0, -15, 15, -30, 30] }; // 5 spread, orange
+                case 5: return { dmg: 3, color: '#fff', angles: [0, -10, 10, -20, 20] }; // 5 spread, white, max dmg
+                default: return { dmg: 1, color: '#0ff', angles: [0] };
+            }
+        }
+
+        function getMaxAllowedWeaponLevel() {
+            if (state.level >= 8) return 5;
+            if (state.level >= 6) return 4;
+            if (state.level >= 4) return 3;
+            if (state.level >= 2) return 2;
+            return 1;
+        }
+
+        function shootLaser() {
+            if (state.isPaused || state.isGameOver || state.transitioning || player.cooldown > 0) return;
+            
+            const config = getWeaponConfig(player.weaponLevel);
+
+            config.angles.forEach(angle => {
+                const el = document.createElement('div');
+                el.className = 'laser';
+                el.style.backgroundColor = config.color;
+                el.style.boxShadow = `0 0 10px ${config.color}, 0 0 20px ${config.color}`;
+                
+                // Rotation visualization
+                if (angle !== 0) {
+                    el.style.transform = `translateX(-50%) rotate(${angle}deg)`;
                 }
-              }
+                
+                container.appendChild(el);
+                
+                // Calculate velocity components based on angle
+                const rad = angle * Math.PI / 180;
+                const speed = 1000;
+                const vx = Math.sin(rad) * speed;
+                const vy = Math.cos(rad) * speed;
+
+                lasers.push({ 
+                    el, x: player.x, y: player.y - 40, 
+                    vx: vx, vy: vy, 
+                    dmg: config.dmg, 
+                    w: 4, h: 25 
+                });
             });
 
-            const bigEnemy = document.querySelector('.big-enemy');
-            if (bigEnemy && isColliding(laser, bigEnemy)) {
-              document.body.removeChild(laser);
-              bossLife -= 10;
-              updateBossLife();
+            player.cooldown = 0.15; // 150ms cooldown
+        }
 
-              if (bossLife <= 0) {
-                endGame('Congratulations! You Win! Your Score: ' + score);
+        function bossShoot() {
+            if (!boss || state.isPaused || state.isGameOver || state.transitioning) return;
+            
+            const el = document.createElement('div');
+            el.className = 'big-enemy-laser';
+            container.appendChild(el);
+            
+            // Slower base speed and slower scaling for boss
+            const laserSpeed = 300 + (state.level - 1) * 30;
+            enemyLasers.push({ el, x: boss.x, y: boss.y + 50, speed: laserSpeed, w: 6, h: 35 });
+        }
+
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 20; i++) {
+                const el = document.createElement('div');
+                el.className = 'particle';
+                el.style.backgroundColor = color;
+                el.style.color = color; // For currentColor shadow
+                container.appendChild(el);
                 
-              }
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 50 + Math.random() * 200;
+                
+                particles.push({
+                    el, x, y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    life: 1.0 + Math.random() * 0.5
+                });
             }
-
-            requestAnimationFrame(moveLaser);
-          }
         }
 
-        requestAnimationFrame(moveLaser);
-      }
-
-      function isColliding(element1, element2) {
-        const rect1 = element1.getBoundingClientRect();
-        const rect2 = element2.getBoundingClientRect();
-        return (
-          rect1.top < rect2.bottom &&
-          rect1.right > rect2.left &&
-          rect1.bottom > rect2.top &&
-          rect1.left < rect2.right
-        );
-      }
-
-      function spawnNewEnemy(index) {
-        if (score < 20) {
-          const newEnemy = document.createElement('div');
-          newEnemy.className = 'enemy';
-          newEnemy.style.left = Math.random() * (window.innerWidth - 50) + 'px';
-          newEnemy.style.top = '0px';
-
-          const enemyImage = document.createElement('img');
-        enemyImage.src = '/Image/modele-autocollant-objet-volant-non-identifie-ovni-isole_1308-57963-removebg-preview.png'; // Chemin vers l'image de l'ennemi
-        enemyImage.style.width = '100%'; // S'assure que l'image remplit le div
-        enemyImage.style.height = '100%'; // S'assure que l'image remplit le div
-        enemyImage.alt = 'Enemy'; // Ajoute un texte alternatif pour l'accessibilité
-
-        newEnemy.appendChild(enemyImage); // Ajoute l'image au div de l'ennemi
-          document.body.appendChild(newEnemy);
-          enemies[index] = newEnemy;
-        }
-      }
-
-      
-
-      function spawnBigEnemy() {
-        if (score === 20) {
-          bossLife = 100;
-          bossLifeElement.style.display = 'block';
-
-          const bigEnemy = document.createElement('div');
-          bigEnemy.className = 'big-enemy';
-          bigEnemy.style.left = Math.random() * (window.innerWidth - 100) + 'px';
-          bigEnemy.style.top = '0px';
-
-          const bigEnemyImage = document.createElement('img');
-        bigEnemyImage.src = '/Image/sticker-png-massive-pixel-starship-removebg-preview.png'; // Chemin vers l'image du gros ennemi
-        bigEnemyImage.style.width = '100%'; // S'assure que l'image remplit le div
-        bigEnemyImage.style.height = '100%'; // S'assure que l'image remplit le div
-        bigEnemyImage.alt = 'Big Enemy'; // Ajoute un texte alternatif pour l'accessibilité
-
-        bigEnemy.appendChild(bigEnemyImage); // Ajoute l'image au div du gros ennemi
-          document.body.appendChild(bigEnemy);
-
-          let bigEnemyX = parseFloat(bigEnemy.style.left);
-          let direction = 1;
-
-          function moveBigEnemy() {
-            if (!gamePaused) {
-              // Changement de direction amélioré
-              if (Math.random() < 0.01) { // 1% de chance à chaque frame
-                direction *= -1;
-              }
-              bigEnemyX += direction * 2;
-
-              // Vérifie les limites de l'écran
-              if (bigEnemyX <= 0 || bigEnemyX >= window.innerWidth - 100) {
-                direction *= -1; // Change de direction si atteint les bords
-                bigEnemyX = Math.max(0, Math.min(bigEnemyX, window.innerWidth - 100)); // Reste dans les limites
-              }
-
-              bigEnemy.style.left = bigEnemyX + 'px';
+        function updateBossLife() {
+            const percentage = (state.bossLife / state.bossMaxLife) * 100;
+            bossLifeFill.style.width = Math.max(0, percentage) + '%';
+            if (percentage <= 20) {
+                bossLifeFill.style.background = '#f00';
+            } else {
+                bossLifeFill.style.background = 'linear-gradient(90deg, #f00, #f0f)';
             }
-
-            requestAnimationFrame(moveBigEnemy);
-          }
-
-          moveBigEnemy();
-
-          setInterval(() => {
-            if (Math.random() < 0.7 && !gamePaused) { // 70% de chance de tirer
-              createBigEnemyLaser(bigEnemyX + 50, 100);
-            }
-          }, 1000); // Tir toutes les 1 secondes
-        }
-      }
-
-      function createBigEnemyLaser(x, y) {
-    const laser = document.createElement('div');
-    laser.className = 'big-enemy-laser';
-    laser.style.left = x + 'px';
-    laser.style.top = y + 'px';
-    document.body.appendChild(laser);
-
-    function moveLaser() {
-        if (gamePaused) {
-            requestAnimationFrame(moveLaser); // Pause si le jeu est en pause
-            return;
         }
 
-        let currentTop = parseInt(laser.style.top, 10) || 0;
-        laser.style.top = currentTop + bigEnemyLaserSpeed + 'px';
-
-        if (currentTop >= window.innerHeight) {
-            document.body.removeChild(laser);
-        } else if (isColliding(laser, spaceship)) {
-            endGame('Game Over! Your Score: ' + score); // Appelez endGame ici
-        } else {
-            requestAnimationFrame(moveLaser);
-        }
-    }
-
-    requestAnimationFrame(moveLaser);
-}
-
-
-      document.getElementById('best-score').textContent = 'Best Score: ' + bestScore;
-
-
-      function endGame(message) {
-            clearInterval(timerInterval);
-            gamePaused = true;
+        function endGame(win) {
+            state.isGameOver = true;
             overlay.style.display = 'block';
-            document.getElementById('end-popup').style.display = 'block'; // Utiliser l'identifiant correct
-            document.getElementById('end-message').innerText = message; // Utiliser l'identifiant correct
-
-            // Mettre à jour le meilleur score
-            if (score > bestScore) {
-                bestScore = score;
-                localStorage.setItem('bestScore', bestScore);
-                document.getElementById('best-score').innerText = 'Best Score: ' + bestScore;
+            endPopup.style.display = 'block';
+            endMessage.textContent = win ? 'MISSION ACCOMPLISHED!' : 'GAME OVER';
+            endMessage.style.color = win ? '#0f0' : '#f00';
+            endMessage.style.textShadow = win ? '2px 2px 0 #050' : '2px 2px 0 #500';
+            endScore.textContent = 'FINAL SCORE: ' + state.score;
+            
+            if (state.score > state.bestScore) {
+                state.bestScore = state.score;
+                localStorage.setItem('spaceInvadersBestScore', state.bestScore);
+                endScore.textContent += ' (NEW RECORD!)';
             }
         }
 
-      function updateScore() {
-        document.getElementById('score').textContent = 'Score: ' + score;
-      
-
-      if (score > bestScore) {
-          bestScore = score;
-          document.getElementById('best-score').textContent = 'Best Score: ' + bestScore;
-          localStorage.setItem('bestScore', bestScore); // Stocker le nouveau bestScore
+        function checkCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
+            return (
+                x1 - w1/2 < x2 + w2/2 &&
+                x1 + w1/2 > x2 - w2/2 &&
+                y1 - h1/2 < y2 + h2/2 &&
+                y1 + h1/2 > y2 - h2/2
+            );
         }
-      }
-      
 
-        function onEnemyDestroyed() {
-        updateScore(); // Appel à la mise à jour du score et du best score
-      }
+        function gameLoop(timestamp) {
+            if (state.isPaused || state.isGameOver) return;
+            
+            if (state.transitioning) {
+                updateParticles(0.016);
+                requestAnimationFrame(gameLoop);
+                return;
+            }
+            
+            if (!state.lastFrameTime) state.lastFrameTime = timestamp;
+            const dt = Math.min((timestamp - state.lastFrameTime) / 1000, 0.1); // Cap dt
+            state.lastFrameTime = timestamp;
 
+            // Timer update
+            state.gameTimeMs += dt;
+            if (Math.floor(state.gameTimeMs) > state.time) {
+                state.time = Math.floor(state.gameTimeMs);
+                timerEl.textContent = 'TIME: ' + state.time + 's';
+            }
 
-      function updateBossLife() {
-        bossLifeElement.textContent = 'Boss Life: ' + bossLife + '%';
-      }
+            // Player invulnerability and blinking
+            if (player.invulnerable > 0) {
+                player.invulnerable -= dt;
+                spaceship.style.opacity = Math.floor(state.gameTimeMs * 10) % 2 === 0 ? '0.3' : '1';
+                if (player.invulnerable <= 0) {
+                    spaceship.style.opacity = '1';
+                }
+            }
 
-      function updateTimer() {
-        if (!gamePaused) {
-          const timerElement = document.getElementById('timer');
-          timerElement.textContent = 'Time: ' + time + 's';
-          time++;
+            // Player movement
+            if (state.keys.ArrowLeft) player.x -= player.speed * dt;
+            if (state.keys.ArrowRight) player.x += player.speed * dt;
+            
+            player.x = Math.max(30, Math.min(window.innerWidth - 30, player.x));
+            spaceship.style.left = player.x + 'px';
+            
+            if (player.cooldown > 0) player.cooldown -= dt;
+
+            // Spawning regular enemies
+            if (!state.bossActive) {
+                enemySpawnTimer += dt * 1000;
+                if (enemySpawnTimer > nextSpawnInterval) {
+                    spawnEnemy();
+                    enemySpawnTimer = 0;
+                    // Less aggressive scaling of spawn interval
+                    nextSpawnInterval = Math.max(600, 1500 - (state.level * 150)); 
+                }
+            }
+
+            // Spawning Health Powerups
+            powerupHealthTimer += dt * 1000;
+            if (powerupHealthTimer > nextPowerupHealth) {
+                spawnPowerup('health');
+                powerupHealthTimer = 0;
+                nextPowerupHealth = 20000 + Math.random() * 15000;
+            }
+
+            // Spawning Weapon Powerups
+            powerupWeaponTimer += dt * 1000;
+            if (powerupWeaponTimer > nextPowerupWeapon) {
+                // Only spawn if player hasn't maxed out for their current level
+                if (player.weaponLevel < getMaxAllowedWeaponLevel() && player.weaponLevel < 5) {
+                    spawnPowerup('weapon');
+                }
+                powerupWeaponTimer = 0;
+                nextPowerupWeapon = 10000 + Math.random() * 10000;
+            }
+
+            // Move Powerups
+            for (let i = powerups.length - 1; i >= 0; i--) {
+                let p = powerups[i];
+                p.y += p.speed * dt;
+                p.el.style.left = p.x + 'px';
+                p.el.style.top = p.y + 'px';
+
+                if (checkCollision(player.x, player.y, 40, 40, p.x, p.y, 30, 30)) {
+                    if (p.type === 'health') {
+                        if (player.lives < 5) { // Cap lives
+                            player.lives++;
+                            updateLivesHud();
+                        }
+                        createExplosion(player.x, player.y, '#f00');
+                    } else if (p.type === 'weapon') {
+                        if (player.weaponLevel < 5) {
+                            player.weaponLevel++;
+                        }
+                        createExplosion(player.x, player.y, getWeaponConfig(player.weaponLevel).color);
+                    }
+                    
+                    p.el.remove();
+                    powerups.splice(i, 1);
+                    continue;
+                }
+
+                if (p.y > window.innerHeight + 50) {
+                    p.el.remove();
+                    powerups.splice(i, 1);
+                }
+            }
+
+            // Move enemies
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                let e = enemies[i];
+                
+                if (e.type === 3) {
+                    // Zigzag movement
+                    e.waveTime += dt;
+                    e.x += e.dirX * 100 * dt; // Slowed down horizontal speed
+                    // Bounce off walls
+                    if (e.x < 30 || e.x > window.innerWidth - 30) {
+                        e.dirX *= -1;
+                        e.x = Math.max(30, Math.min(window.innerWidth - 30, e.x));
+                    }
+                }
+                
+                e.y += e.speed * dt;
+                e.el.style.left = e.x + 'px';
+                e.el.style.top = e.y + 'px';
+
+                // Shooter enemy logic
+                if (e.type === 2) {
+                    e.shootTimer += dt;
+                    if (e.shootTimer > e.nextShoot) {
+                        enemyShoot(e);
+                        e.shootTimer = 0;
+                        e.nextShoot = 2.0 + Math.random() * 3.0; // Random cooldown
+                    }
+                }
+
+                // Player collision with enemy
+                if (checkCollision(player.x, player.y, 40, 40, e.x, e.y, e.width, e.height)) {
+                    if (hitPlayer()) {
+                        createExplosion(e.x, e.y, '#ff0');
+                        e.el.remove();
+                        enemies.splice(i, 1);
+                    }
+                } else if (e.y > window.innerHeight + 50) {
+                    e.el.remove();
+                    enemies.splice(i, 1);
+                }
+            }
+
+            // Move Boss
+            if (state.bossActive && boss) {
+                boss.x += boss.speedX * boss.direction * dt;
+                
+                if (boss.x < 100 || boss.x > window.innerWidth - 100) {
+                    boss.direction *= -1;
+                    boss.x = Math.max(100, Math.min(window.innerWidth - 100, boss.x));
+                }
+                
+                if (Math.random() < 0.015) {
+                    boss.direction = Math.random() < 0.5 ? -1 : 1;
+                }
+                
+                boss.el.style.left = boss.x + 'px';
+                boss.el.style.top = boss.y + 'px';
+
+                boss.shootTimer += dt;
+                const shootInterval = Math.max(0.3, 0.8 - (state.level - 1) * 0.1);
+                if (boss.shootTimer > shootInterval) { 
+                    bossShoot();
+                    boss.shootTimer = 0;
+                }
+                
+                if (checkCollision(player.x, player.y, 40, 40, boss.x, boss.y, 100, 100)) {
+                    hitPlayer();
+                }
+            }
+
+            // Move Player Lasers & Collisions
+            for (let i = lasers.length - 1; i >= 0; i--) {
+                let l = lasers[i];
+                l.x += l.vx * dt;
+                l.y -= l.vy * dt;
+                l.el.style.left = l.x + 'px';
+                l.el.style.top = l.y + 'px';
+                
+                let hit = false;
+
+                // Boss collision
+                if (state.bossActive && boss) {
+                    if (checkCollision(l.x, l.y, l.w, l.h, boss.x, boss.y, 120, 120)) {
+                        state.bossLife -= l.dmg;
+                        updateBossLife();
+                        createExplosion(l.x, l.y, l.color);
+                        
+                        boss.el.style.filter = `hue-rotate(${((state.level - 1) * 75) % 360}deg) brightness(2) drop-shadow(0 0 20px #fff)`;
+                        setTimeout(() => { if(boss && boss.el) boss.el.style.filter = `hue-rotate(${((state.level - 1) * 75) % 360}deg)`; }, 100);
+                        
+                        l.el.remove();
+                        lasers.splice(i, 1);
+                        hit = true;
+                        
+                        if (state.bossLife <= 0) {
+                            createExplosion(boss.x, boss.y, '#f0f');
+                            createExplosion(boss.x + 40, boss.y - 20, '#f00');
+                            createExplosion(boss.x - 40, boss.y + 20, '#ff0');
+                            boss.el.remove();
+                            boss = null;
+                            state.bossActive = false;
+                            bossLifeContainer.style.display = 'none';
+                            
+                            state.score += 1000 * state.level;
+                            scoreEl.textContent = 'SCORE: ' + state.score;
+                            
+                            setTimeout(() => {
+                                state.level++;
+                                startLevelTransition();
+                            }, 1500);
+                        }
+                    }
+                }
+
+                if (hit) continue;
+
+                // Regular enemy collision
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    let e = enemies[j];
+                    if (checkCollision(l.x, l.y, l.w, l.h, e.x, e.y, e.width, e.height)) {
+                        e.hp -= l.dmg;
+                        
+                        if (e.hp <= 0) {
+                            createExplosion(e.x, e.y, '#ff0');
+                            e.el.remove();
+                            enemies.splice(j, 1);
+                            
+                            state.score += 10 * (e.type || 1); // More points for harder enemies
+                            state.enemiesKilledThisLevel++;
+                            scoreEl.textContent = 'SCORE: ' + state.score;
+                            
+                            if (state.enemiesKilledThisLevel >= 20 && !state.bossActive) {
+                                spawnBoss();
+                            }
+                        } else {
+                            // Flash effect for surviving enemies
+                            createExplosion(l.x, l.y, '#fff'); // small white spark
+                            // Keep their color hue but boost brightness
+                            const currentFilter = e.el.querySelector('img').style.filter || '';
+                            e.el.querySelector('img').style.filter = currentFilter + ' brightness(3)';
+                            setTimeout(() => {
+                                if (e && e.el && e.el.querySelector('img')) e.el.querySelector('img').style.filter = currentFilter;
+                            }, 100);
+                        }
+
+                        l.el.remove();
+                        lasers.splice(i, 1);
+                        hit = true;
+                        break;
+                    }
+                }
+                
+                if (!hit && (l.y < -30 || l.x < -30 || l.x > window.innerWidth + 30)) {
+                    l.el.remove();
+                    lasers.splice(i, 1);
+                }
+            }
+
+            // Move Enemy Lasers (Boss & Type 2 enemies)
+            for (let i = enemyLasers.length - 1; i >= 0; i--) {
+                let l = enemyLasers[i];
+                l.y += l.speed * dt;
+                l.el.style.left = l.x + 'px';
+                l.el.style.top = l.y + 'px';
+
+                if (checkCollision(l.x, l.y, l.w, l.h, player.x, player.y, 40, 40)) {
+                    if (hitPlayer()) {
+                        l.el.remove();
+                        enemyLasers.splice(i, 1);
+                    }
+                } else if (l.y > window.innerHeight + 30) {
+                    l.el.remove();
+                    enemyLasers.splice(i, 1);
+                }
+            }
+
+            updateParticles(dt);
+            requestAnimationFrame(gameLoop);
         }
-      }
 
-
-      function restartGame() {
-            score = 0;
-            time = 0;
-            bossLife = 100;
-            enemies.length = 0; // Réinitialiser le tableau des ennemis
-            gamePaused = false;
-
-            // Masquer la pop-up et l'overlay
-            overlay.style.display = 'none';
-            endPopup.style.display = 'none';
-
-            // Réinitialiser les éléments du jeu
-            document.querySelectorAll('.enemy').forEach(enemy => enemy.remove());
-            document.querySelectorAll('.big-enemy').forEach(enemy => enemy.remove());
-            document.querySelectorAll('.laser').forEach(laser => laser.remove());
-
-            spawnInitialEnemies();
-            updateScore();
-            updateBossLife();
-            startTimer();
+        function updateParticles(dt) {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x += p.vx * dt;
+                p.y += p.vy * dt;
+                p.life -= dt * 1.5;
+                
+                if (p.life <= 0) {
+                    p.el.remove();
+                    particles.splice(i, 1);
+                } else {
+                    p.el.style.left = p.x + 'px';
+                    p.el.style.top = p.y + 'px';
+                    p.el.style.opacity = p.life;
+                }
+            }
         }
-  
 
-      timerInterval = setInterval(updateTimer, 1000);
+        // Initialize game properly centered
+        window.addEventListener('resize', () => {
+            player.y = window.innerHeight - 50;
+            spaceship.style.bottom = '20px';
+        });
 
-      window.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-          togglePause();
-        }
-        if (!gamePaused) {
-          if (event.key === 'ArrowLeft') {
-            isMovingLeft = true;
-          }
-          if (event.key === 'ArrowRight') {
-            isMovingRight = true;
-          }
-          if (event.key === ' ') {
-            createLaser(spaceshipX + spaceshipWidth / 2, window.innerHeight - 50);
-          }
-        }
-      });
-
-      window.addEventListener('keyup', (event) => {
-        if (event.key === 'ArrowLeft') {
-          isMovingLeft = false;
-        }
-        if (event.key === 'ArrowRight') {
-          isMovingRight = false;
-        }
-      });
-
-      function togglePause() {
-        gamePaused = !gamePaused;
-        overlay.style.display = gamePaused ? 'block' : 'none';
-        pausePopup.style.display = gamePaused ? 'block' : 'none';
-      }
-
-      resumeButton.addEventListener('click', () => {
-        togglePause();
-      });
-
-      restartButton.addEventListener('click', () => {
-    location.reload(); 
-});
-
-document.getElementById('newgame-button').addEventListener('click', () => {
-  location.reload();
-});
-
-      moveEnemies();
-      updateSpaceshipPosition();
-      updateScore();
+        // Start Game
+        startLevelTransition();
     </script>
-  </body>
-</html> 
+</body>
+</html>
