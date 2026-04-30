@@ -902,6 +902,8 @@
             measurementId: "G-43SWG3T5CL"
         };
 
+        const SAVE_VERSION = "1.2"; // Incrémenter si la structure change
+
         // Initialisation optionnelle
         let db = null;
         try {
@@ -955,39 +957,52 @@
 
         function saveGameData() {
             const data = {
+                v: SAVE_VERSION,
                 coins: state.coins,
                 upgrades: upgrades,
                 bestScore: state.bestScore,
                 inventory: inventory,
-                level: state.level // On sauve aussi le niveau pour la cohérence
+                level: state.level
             };
             const json = JSON.stringify(data);
-            // Signature beaucoup plus complexe pour décourager ton pote
-            const salt = "S3CUR3_SP4C3_" + state.level;
+            const salt = "S3CUR3_V" + SAVE_VERSION + "_" + state.level;
             const signature = btoa(unescape(encodeURIComponent(json + salt))).split('').reverse().join('X'); 
             localStorage.setItem('spaceInvadersSave', json);
             localStorage.setItem('spaceInvadersSig', signature);
         }
 
         function loadGameData() {
-            const json = localStorage.getItem('spaceInvadersSave');
-            const sig = localStorage.getItem('spaceInvadersSig');
-            if (json && sig) {
-                const data = JSON.parse(json);
-                const salt = "S3CUR3_SP4C3_" + (data.level || 1);
-                const expectedSig = btoa(unescape(encodeURIComponent(json + salt))).split('').reverse().join('X');
-                
-                if (sig === expectedSig) {
-                    state.bestScore = data.bestScore || 0;
-                    upgrades = data.upgrades || upgrades;
-                    inventory = data.inventory || inventory;
-                } else {
-                    console.warn("Anti-cheat: Save corrupted.");
-                    localStorage.clear(); // Punition : on rase tout
+            try {
+                const json = localStorage.getItem('spaceInvadersSave');
+                const sig = localStorage.getItem('spaceInvadersSig');
+                if (json && sig) {
+                    const data = JSON.parse(json);
+                    
+                    // Si version différente, on ne charge pas mais on ne crash pas
+                    if (data.v !== SAVE_VERSION) {
+                        console.warn("Version mismatch. Save ignored.");
+                        return;
+                    }
+
+                    const salt = "S3CUR3_V" + SAVE_VERSION + "_" + (data.level || 1);
+                    const expectedSig = btoa(unescape(encodeURIComponent(json + salt))).split('').reverse().join('X');
+                    
+                    if (sig === expectedSig) {
+                        state.bestScore = data.bestScore || 0;
+                        state.level = data.level || 1;
+                        state.coins = data.coins || 0;
+                        if (data.upgrades) Object.assign(upgrades, data.upgrades);
+                        if (data.inventory) Object.assign(inventory, data.inventory);
+                    } else {
+                        console.warn("Anti-cheat: Save corrupted.");
+                    }
                 }
+            } catch (e) {
+                console.error("Load failed:", e);
             }
             state._coinsCheck = state.coins * 456 + 789;
             updateLevelCheck();
+            updateCoinsHud();
         }
         loadGameData();
 
