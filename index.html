@@ -218,6 +218,39 @@
             animation: pulse-powerup 1s infinite alternate;
         }
 
+        #lives-hud {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .heart {
+            position: relative;
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.2); /* Couleur coeur vide */
+            line-height: 1;
+        }
+
+        .heart::before {
+            content: '♥';
+        }
+
+        .heart.full {
+            color: #ff2d55; /* Rouge vif premium */
+            text-shadow: 0 0 10px rgba(255, 45, 85, 0.5);
+        }
+
+        .heart.half::after {
+            content: '♥';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 50%;
+            overflow: hidden;
+            color: #ff2d55;
+            text-shadow: 0 0 10px rgba(255, 45, 85, 0.5);
+        }
+
         .powerup-health {
             color: #f00;
             text-shadow: 0 0 10px #f00, 0 0 20px #fff;
@@ -988,10 +1021,10 @@
             y: window.innerHeight - 50,
             speed: 425 + (upgrades.speed * 42.5),
             cooldown: 0,
-            maxLives: 3 + upgrades.lives,
-            lives: 3 + upgrades.lives,
+            maxLives: (3 + upgrades.lives) * 2, // 1 coeur = 2 points
+            lives: (3 + upgrades.lives) * 2,
             invulnerable: 0,
-            weaponLevel: 1 + upgrades.weapon, // Starts at level 1, goes up to 6
+            weaponLevel: 1 + upgrades.weapon,
             hasShield: false,
             dmgBoostTimer: 0,
             fireRateTimer: 0,
@@ -1014,13 +1047,6 @@
 
         spaceship.style.left = player.x + 'px';
 
-        // HUD Updates
-        function updateLivesHud() {
-            let hearts = '';
-            for (let i = 0; i < player.lives; i++) hearts += '♥';
-            for (let i = player.lives; i < player.maxLives; i++) hearts += '♡';
-            livesHudEl.textContent = hearts;
-        }
         function updateCoinsHud() {
             coinsHudEl.textContent = '💰 ' + state.coins;
             localStorage.setItem('spaceInvadersCoins', state.coins);
@@ -1040,7 +1066,7 @@
         updateInventoryHud();
 
         // Damage Player
-        function hitPlayer() {
+        function hitPlayer(damage = 2) { // Par défaut 1 coeur = 2 points
             if (player.invulnerable > 0) return false;
 
             if (player.hasShield) {
@@ -1051,7 +1077,9 @@
                 return true;
             }
 
-            player.lives--;
+            player.lives -= damage;
+            if (player.lives < 0) player.lives = 0;
+            
             updateLivesHud();
             createExplosion(player.x, player.y, '#f00');
 
@@ -1228,16 +1256,20 @@
             if (type === 'weapon') cost = 100 + upgrades.weapon * 50;
 
             if (state.coins >= cost && upgrades[type] < 5) {
-                state.coins -= cost;
+                addCoins(-cost);
                 upgrades[type]++;
-                localStorage.setItem('upg_' + type, upgrades[type]);
-                updateCoinsHud();
-                updateShopUI();
-
+                
                 // Apply immediate effects
-                if (type === 'lives') { player.maxLives++; player.lives++; updateLivesHud(); }
+                if (type === 'lives') { 
+                    player.maxLives = (3 + upgrades.lives) * 2; 
+                    player.lives += 2; // Soigne de 1 coeur lors de l'achat
+                    updateLivesHud(); 
+                }
                 if (type === 'speed') { player.speed = 425 + upgrades.speed * 42.5; }
                 if (type === 'weapon') { player.weaponLevel = 1 + upgrades.weapon; }
+                
+                updateCoinsHud();
+                updateShopUI();
             }
         }
 
@@ -1311,7 +1343,7 @@
         function enemyShoot(enemy) {
             const el = document.createElement('div'); el.className = 'enemy-laser'; container.appendChild(el);
             const laserSpeed = 255 + (state.level * 17);
-            enemyLasers.push({ el, x: enemy.x, y: enemy.y + 25, speed: laserSpeed, w: 4, h: 15 });
+            enemyLasers.push({ el, x: enemy.x, y: enemy.y + 25, speed: laserSpeed, w: 4, h: 15, damage: 1 });
         }
 
         const powerupTypes = ['health'];
@@ -1411,35 +1443,59 @@
         }
 
         function bossShoot(phase) {
-            if (!boss || state.isPaused || state.isGameOver || state.transitioning) return;
-            const laserSpeed = 255 + (state.level - 1) * 25.5;
+            if (!boss || state.isPaused) return;
 
-            // Use level 1 (single laser) if below level 10
-            const actualPhase = state.level < 10 ? 1 : phase;
+            const laserSpeed = 350 + (state.level - 1) * 25;
+            const container = document.getElementById('game-container');
+            const actualPhase = (state.level >= 10 && boss.phase === 2) ? 2 : 1;
+            
+            // Calcul des dégâts : Base 1 coeur (2 pts) + 0.5 coeur (1 pt) tous les 5 levels. Max 4 coeurs (8 pts).
+            const bossDamage = Math.min(8, 2 + Math.floor(state.level / 5));
 
             if (actualPhase === 1) {
                 const el = document.createElement('div'); el.className = 'big-enemy-laser'; container.appendChild(el);
                 enemyLasers.push({
                     el, x: boss.x, y: boss.y + 50, speed: laserSpeed,
                     w: 6, h: 35, vx: 0, vy: laserSpeed,
-                    isHoming: state.level >= 3
+                    isHoming: state.level >= 3,
+                    damage: bossDamage
                 });
             } else if (actualPhase === 2) {
                 const el1 = document.createElement('div'); el1.className = 'big-enemy-laser'; container.appendChild(el1);
                 const el2 = document.createElement('div'); el2.className = 'big-enemy-laser'; container.appendChild(el2);
-                enemyLasers.push({ el: el1, x: boss.x - 30, y: boss.y + 50, speed: laserSpeed, w: 6, h: 35 });
-                enemyLasers.push({ el: el2, x: boss.x + 30, y: boss.y + 50, speed: laserSpeed, w: 6, h: 35 });
-            } else if (actualPhase === 3) {
-                const angles = [0, -20, 20];
-                angles.forEach(angle => {
-                    const el = document.createElement('div'); el.className = 'big-enemy-laser';
-                    if (angle !== 0) el.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-                    container.appendChild(el);
-                    const rad = angle * Math.PI / 180;
-                    const vx = Math.sin(rad) * laserSpeed;
-                    const vy = Math.cos(rad) * laserSpeed;
-                    enemyLasers.push({ el, x: boss.x, y: boss.y + 50, speed: laserSpeed, w: 6, h: 35, vx, vy });
+                enemyLasers.push({
+                    el: el1, x: boss.x - 40, y: boss.y + 50, speed: laserSpeed,
+                    w: 6, h: 35, vx: -100, vy: laserSpeed,
+                    isHoming: state.level >= 3,
+                    damage: bossDamage
                 });
+                enemyLasers.push({
+                    el: el2, x: boss.x + 40, y: boss.y + 50, speed: laserSpeed,
+                    w: 6, h: 35, vx: 100, vy: laserSpeed,
+                    isHoming: state.level >= 3,
+                    damage: bossDamage
+                });
+            }
+            boss.phase = boss.phase === 1 ? 2 : 1;
+        }
+
+        // HUD Updates avec support visuel demi-coeur
+        function updateLivesHud() {
+            livesHudEl.innerHTML = '';
+            const totalHearts = player.maxLives / 2;
+            
+            for (let i = 0; i < totalHearts; i++) {
+                const currentStatus = player.lives - (i * 2);
+                const heart = document.createElement('span');
+                heart.className = 'heart';
+                
+                if (currentStatus >= 2) {
+                    heart.classList.add('full');
+                } else if (currentStatus === 1) {
+                    heart.classList.add('half');
+                }
+                
+                livesHudEl.appendChild(heart);
             }
         }
 
@@ -1868,7 +1924,11 @@
                 }
 
                 l.el.style.left = l.x + 'px'; l.el.style.top = l.y + 'px';
-                if (checkCollision(l.x, l.y, l.w, l.h, player.x, player.y, 40, 40)) { if (hitPlayer()) { l.el.remove(); enemyLasers.splice(i, 1); } }
+                if (checkCollision(l.x, l.y, l.w, l.h, player.x, player.y, 40, 40)) { 
+                    if (hitPlayer(l.damage || 2)) { // Dégâts normaux (2) ou boss damage
+                        l.el.remove(); enemyLasers.splice(i, 1); 
+                    } 
+                }
                 else if (l.y > window.innerHeight + 30) { l.el.remove(); enemyLasers.splice(i, 1); }
             }
 
@@ -1925,8 +1985,9 @@
             startLevelTransition();
         };
 
-        // Supprimer l'appel automatique pour attendre le clic sur START
-        // startLevelTransition(); 
+        // Initialisation UI
+        updateLivesHud();
+        updateCoinsHud();
         
         })(); // FIN ENCAPSULATION ANTI-TRICHE
     </script>
