@@ -1877,11 +1877,18 @@
         }
 
         function killBoss() {
-            createExplosion(boss.x, boss.y, '#f0f'); createExplosion(boss.x + 40, boss.y - 20, '#f00'); createExplosion(boss.x - 40, boss.y + 20, '#ff0');
+            state.transitioning = true; // Fige le jeu (sauf les explosions)
+            
+            createExplosion(boss.x, boss.y, '#f0f'); 
+            createExplosion(boss.x + 40, boss.y - 20, '#f00'); 
+            createExplosion(boss.x - 40, boss.y + 20, '#ff0');
+            
             addCoins(50);
             boss.el.remove(); boss = null; state.bossActive = false; bossLifeContainer.style.display = 'none';
             addScore(1000 * state.level); scoreEl.textContent = 'SCORE: ' + state.score;
+            
             setTimeout(() => {
+                state.transitioning = false;
                 state.isPaused = true;
                 state.inShop = true;
                 state.shopFromLevelEnd = true;
@@ -1889,7 +1896,7 @@
                 shopPopup.style.display = 'block';
                 document.getElementById('shop-close-btn').textContent = 'NEXT LEVEL';
                 updateShopUI();
-            }, 3000);
+            }, 1500); // 1.5s d'explosion c'est parfait
         }
 
         function updateParticles(dt) {
