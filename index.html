@@ -1055,7 +1055,7 @@
             
             // Passive energy gen (increased by upgrade)
             if (!player.isFiringBeam && state.energy < 100) {
-                state.energy += (2 + upgrades.energy * 1) * dt;
+                state.energy += (1.4 + upgrades.energy * 0.7) * dt;
                 if (state.energy >= 100) {
                     state.energy = 100;
                     energyText.className = 'energy-ready';
@@ -1245,7 +1245,7 @@
                             scoreEl.textContent = 'SCORE: ' + state.score;
                             
                             // Gain energy on kill
-                            if(!player.isFiringBeam) state.energy = Math.min(100, state.energy + 5);
+                            if(!player.isFiringBeam) state.energy = Math.min(100, state.energy + 1);
                             
                             if (state.enemiesKilledThisLevel >= 20 && !state.bossActive) spawnBoss();
                         } else {
