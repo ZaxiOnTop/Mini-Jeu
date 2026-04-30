@@ -1356,8 +1356,8 @@
             TANK: { hp: 5, speed: 0.45, fireRate: 0.008, score: 60, filter: 'hue-rotate(300deg) saturate(2)', size: 60, coins: 5 }, 
             KAMIKAZE: { hp: 1, speed: 2.8, fireRate: 0, score: 30, filter: 'hue-rotate(45deg) saturate(3) contrast(1.5)', dash: true, coins: 3 },
             ASTEROID: { hp: 10, speed: 1.0, fireRate: 0, score: 5, filter: 'grayscale(1) brightness(0.7)', size: 80, isHazard: true, coins: 10 },
-            CARGO: { hp: 1, speed: 2.2, fireRate: 0, score: 100, filter: 'sepia(1) saturate(10) brightness(1.2)', horizontal: true, coins: 10, size: 100, img: 'Image/cargo.png' },
-            SUPER_CARGO: { hp: 2, speed: 2.8, fireRate: 0, score: 500, filter: 'brightness(3) saturate(0) contrast(2)', horizontal: true, coins: 50, size: 130, img: 'Image/cargo.png' }
+            CARGO: { hp: 6, speed: 0.85, fireRate: 0, score: 100, filter: 'sepia(1) saturate(10) brightness(1.2)', horizontal: true, coins: 10, size: 150, img: 'Image/cargo.png' },
+            SUPER_CARGO: { hp: 8, speed: 1.1, fireRate: 0, score: 500, filter: 'brightness(3) saturate(0) contrast(2)', horizontal: true, coins: 50, size: 200, img: 'Image/cargo.png' }
         };
 
         function spawnEnemy(typeKey = 'SCOUT', customX = null, customY = -60) {
@@ -1460,22 +1460,56 @@
 
         const powerupTypes = ['health', 'weapon', 'time', 'shield', 'damage', 'firerate', 'homing'];
         const consumableTypes = ['health', 'time', 'shield', 'damage', 'firerate', 'homing'];
-        const powerupIcons = { 'health': '♥', 'weapon': '🔫', 'time': '⌛', 'shield': '🛡️', 'damage': '💥', 'firerate': '⚡', 'homing': '🎯' };
 
         function spawnPowerup(x, y, onlyConsumables = false, specificType = null) {
             const list = onlyConsumables ? consumableTypes : powerupTypes;
             const type = specificType || list[Math.floor(Math.random() * list.length)];
-            const el = document.createElement('div');
-            el.className = 'powerup powerup-' + type;
             
+            // AJOUT DIRECT À L'INVENTAIRE
             if (type === 'health') {
-                el.innerHTML = '<span class="heart full" style="font-size: 20px;"></span>';
-            } else {
-                el.textContent = powerupIcons[type];
+                player.lives = Math.min(player.maxLives, player.lives + 2);
+                updateLivesHud();
+                showFloatingText(x, y, "+1 HEART", "#f00");
+            } else if (type === 'time') {
+                state.slowTimeRemaining += 5.0;
+                showFloatingText(x, y, "+TIME", "#a200ff");
+            } else if (inventory.hasOwnProperty(type)) {
+                inventory[type]++;
+                updateInventoryHud();
+                showFloatingText(x, y, "+1 " + type.toUpperCase(), "#0ff");
+            } else if (type === 'weapon') {
+                upgrades.weapon = Math.min(3, upgrades.weapon + 1);
+                showFloatingText(x, y, "WEAPON UP!", "#ff0");
             }
-            
+        }
+
+        function showFloatingText(x, y, text, color) {
+            const el = document.createElement('div');
+            el.textContent = text;
+            el.style.position = 'absolute';
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            el.style.color = color;
+            el.style.fontFamily = "'Press Start 2P', cursive";
+            el.style.fontSize = '12px';
+            el.style.pointerEvents = 'none';
+            el.style.zIndex = '100';
+            el.style.whiteSpace = 'nowrap';
+            el.style.textShadow = '1px 1px 0 #000';
             container.appendChild(el);
-            powerups.push({ el, x, y, speed: 120, type: type });
+
+            let opacity = 1;
+            let posY = y;
+            const anim = setInterval(() => {
+                posY -= 1;
+                opacity -= 0.02;
+                el.style.top = posY + 'px';
+                el.style.opacity = opacity;
+                if (opacity <= 0) {
+                    clearInterval(anim);
+                    el.remove();
+                }
+            }, 30);
         }
 
 
@@ -1857,40 +1891,6 @@
                     nextSpawnInterval = Math.max(800, 3000 - (state.level * 200));
                 }
             }
-            // Powerups (On enlève le spawn aléatoire pour privilégier le Cargo)
-            /* 
-            powerupTimer += gameDt * 1000;
-            if (powerupTimer > nextPowerup) {
-                spawnPowerup(50 + Math.random() * (window.innerWidth - 100), -50); 
-                powerupTimer = 0; nextPowerup = 20000 + Math.random() * 15000;
-            }
-            */
-
-            // Powerups
-            for (let i = powerups.length - 1; i >= 0; i--) {
-                let p = powerups[i];
-                p.y += p.speed * gameDt;
-                p.el.style.left = p.x + 'px'; p.el.style.top = p.y + 'px';
-
-                if (checkCollision(player.x, player.y, 40, 40, p.x, p.y, 30, 30)) {
-                    if (p.type === 'health' && player.lives < player.maxLives) { 
-                        player.lives = Math.min(player.maxLives, player.lives + 2);
-                        updateLivesHud(); 
-                    }
-                    else if (p.type === 'weapon' && player.weaponLevel < 5) player.weaponLevel++;
-                    else if (p.type === 'time') state.slowTimeRemaining = 6.0;
-                    else if (p.type === 'shield') { player.hasShield = true; shieldBubble.style.display = 'block'; }
-                    else if (p.type === 'damage') player.dmgBoostTimer = 8.0;
-                    else if (p.type === 'firerate') player.fireRateTimer = 8.0;
-                    else if (p.type === 'homing') player.homingTimer = 10.0;
-
-                    createExplosion(player.x, player.y, '#fff');
-                    p.el.remove(); powerups.splice(i, 1); continue;
-                }
-                if (p.y > window.innerHeight + 50) { p.el.remove(); powerups.splice(i, 1); }
-            }
-
-
 
             // Enemies
             for (let i = enemies.length - 1; i >= 0; i--) {
