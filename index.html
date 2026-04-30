@@ -1762,7 +1762,10 @@
                 p.el.style.left = p.x + 'px'; p.el.style.top = p.y + 'px';
 
                 if (checkCollision(player.x, player.y, 40, 40, p.x, p.y, 30, 30)) {
-                    if (p.type === 'health' && player.lives < player.maxLives) { player.lives++; updateLivesHud(); }
+                    if (p.type === 'health' && player.lives < player.maxLives) { 
+                        player.lives = Math.min(player.maxLives, player.lives + 2);
+                        updateLivesHud(); 
+                    }
                     else if (p.type === 'weapon' && player.weaponLevel < 5) player.weaponLevel++;
                     else if (p.type === 'time') state.slowTimeRemaining = 6.0;
                     else if (p.type === 'shield') { player.hasShield = true; shieldBubble.style.display = 'block'; }
