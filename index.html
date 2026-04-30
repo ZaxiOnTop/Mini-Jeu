@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,10 +44,18 @@
             filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
             animation: float 2s ease-in-out infinite;
         }
-        
-        #spaceship.dmg-boost img { filter: drop-shadow(0 0 15px #f00) brightness(1.5); }
-        #spaceship.fire-rate img { filter: drop-shadow(0 0 15px #0ff) brightness(1.5); }
-        #spaceship.homing-boost img { filter: drop-shadow(0 0 15px #0f0) brightness(1.5); }
+
+        #spaceship.dmg-boost img {
+            filter: drop-shadow(0 0 15px #f00) brightness(1.5);
+        }
+
+        #spaceship.fire-rate img {
+            filter: drop-shadow(0 0 15px #0ff) brightness(1.5);
+        }
+
+        #spaceship.homing-boost img {
+            filter: drop-shadow(0 0 15px #0f0) brightness(1.5);
+        }
 
         .shield-bubble {
             display: none;
@@ -57,7 +66,8 @@
             border: 3px solid rgba(0, 255, 255, 0.8);
             background: rgba(0, 255, 255, 0.2);
             box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-            top: 50%; left: 50%;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
             pointer-events: none;
         }
@@ -76,14 +86,29 @@
             pointer-events: none;
             animation: beam-pulse 0.1s infinite alternate;
         }
-        @keyframes beam-pulse { 
-            0% { width: 30px; opacity: 0.8; } 
-            100% { width: 60px; opacity: 1; } 
+
+        @keyframes beam-pulse {
+            0% {
+                width: 30px;
+                opacity: 0.8;
+            }
+
+            100% {
+                width: 60px;
+                opacity: 1;
+            }
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
         }
 
         .enemy {
@@ -102,16 +127,41 @@
         }
 
         /* Enemy Types */
-        .enemy-type-1 img { filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.8)); }
-        .enemy-type-2 img { filter: hue-rotate(180deg) drop-shadow(0 0 10px #f00); }
-        .enemy-type-3 img { filter: hue-rotate(90deg) drop-shadow(0 0 10px #ff0); }
-        .enemy-type-4 { width: 65px; height: 65px; }
-        .enemy-type-4 img { filter: hue-rotate(270deg) drop-shadow(0 0 15px #f0f); }
+        .enemy-type-1 img {
+            filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.8));
+        }
+
+        .enemy-type-2 img {
+            filter: hue-rotate(180deg) drop-shadow(0 0 10px #f00);
+        }
+
+        .enemy-type-3 img {
+            filter: hue-rotate(90deg) drop-shadow(0 0 10px #ff0);
+        }
+
+        .enemy-type-4 {
+            width: 65px;
+            height: 65px;
+        }
+
+        .enemy-type-4 img {
+            filter: hue-rotate(270deg) drop-shadow(0 0 15px #f0f);
+        }
 
         @keyframes enemy-shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-3px); }
-            75% { transform: translateX(3px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-3px);
+            }
+
+            75% {
+                transform: translateX(3px);
+            }
         }
 
         .big-enemy {
@@ -123,7 +173,11 @@
             filter: drop-shadow(0 0 20px rgba(255, 0, 255, 0.6));
         }
 
-        .big-enemy img { width: 100%; height: 100%; object-fit: contain; }
+        .big-enemy img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
 
         .laser {
             width: 4px;
@@ -164,17 +218,49 @@
             animation: pulse-powerup 1s infinite alternate;
         }
 
-        .powerup-health { color: #f00; text-shadow: 0 0 10px #f00, 0 0 20px #fff; }
-        .powerup-weapon { color: #0ff; text-shadow: 0 0 10px #0ff, 0 0 20px #fff; }
-        .powerup-time { color: #a200ff; text-shadow: 0 0 10px #a200ff, 0 0 20px #fff; }
-        .powerup-shield { color: #00f; text-shadow: 0 0 10px #00f, 0 0 20px #0ff; }
-        .powerup-damage { color: #f00; text-shadow: 0 0 10px #f00, 0 0 20px #ff0; }
-        .powerup-firerate { color: #ff0; text-shadow: 0 0 10px #ff0, 0 0 20px #fff; }
-        .powerup-homing { color: #0f0; text-shadow: 0 0 10px #0f0, 0 0 20px #fff; }
+        .powerup-health {
+            color: #f00;
+            text-shadow: 0 0 10px #f00, 0 0 20px #fff;
+        }
+
+        .powerup-weapon {
+            color: #0ff;
+            text-shadow: 0 0 10px #0ff, 0 0 20px #fff;
+        }
+
+        .powerup-time {
+            color: #a200ff;
+            text-shadow: 0 0 10px #a200ff, 0 0 20px #fff;
+        }
+
+        .powerup-shield {
+            color: #00f;
+            text-shadow: 0 0 10px #00f, 0 0 20px #0ff;
+        }
+
+        .powerup-damage {
+            color: #f00;
+            text-shadow: 0 0 10px #f00, 0 0 20px #ff0;
+        }
+
+        .powerup-firerate {
+            color: #ff0;
+            text-shadow: 0 0 10px #ff0, 0 0 20px #fff;
+        }
+
+        .powerup-homing {
+            color: #0f0;
+            text-shadow: 0 0 10px #0f0, 0 0 20px #fff;
+        }
 
         @keyframes pulse-powerup {
-            from { transform: translateX(-50%) scale(1); }
-            to { transform: translateX(-50%) scale(1.3) rotate(10deg); }
+            from {
+                transform: translateX(-50%) scale(1);
+            }
+
+            to {
+                transform: translateX(-50%) scale(1.3) rotate(10deg);
+            }
         }
 
         .hud {
@@ -185,23 +271,86 @@
             text-shadow: 2px 2px 0 #000;
         }
 
-        #score-container { left: 20px; }
-        #lives-container { left: 20px; top: 60px; color: #f00; font-size: 18px; }
-        #coins-container { left: 20px; top: 90px; color: #ffdf00; font-size: 18px; }
-        
-        #timer-container { right: 20px; text-align: right; }
-        
-        #energy-container { right: 20px; top: 60px; text-align: right; width: 150px; }
-        #energy-bar-wrap { width: 100%; height: 12px; border: 2px solid #fff; background: rgba(0,0,0,0.5); margin-top: 5px; }
-        #energy-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #0ff, #fff); transition: width 0.1s; }
-        #energy-text { font-size: 10px; color: #0ff; margin-top: 5px; animation: none; }
-        .energy-ready { animation: blink-text 0.5s infinite !important; color: #fff !important; }
+        #score-container {
+            left: 20px;
+        }
 
-        @keyframes blink-text { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
+        #lives-container {
+            left: 20px;
+            top: 60px;
+            color: #f00;
+            font-size: 18px;
+        }
 
-        #level-container { left: 50%; transform: translateX(-50%); text-align: center; }
+        #coins-container {
+            left: 20px;
+            top: 90px;
+            color: #ffdf00;
+            font-size: 18px;
+        }
 
-        .hud div { margin-bottom: 12px; }
+        #timer-container {
+            right: 20px;
+            text-align: right;
+        }
+
+        #energy-container {
+            right: 20px;
+            top: 60px;
+            text-align: right;
+            width: 150px;
+        }
+
+        #energy-bar-wrap {
+            width: 100%;
+            height: 12px;
+            border: 2px solid #fff;
+            background: rgba(0, 0, 0, 0.5);
+            margin-top: 5px;
+        }
+
+        #energy-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #0ff, #fff);
+            transition: width 0.1s;
+        }
+
+        #energy-text {
+            font-size: 10px;
+            color: #0ff;
+            margin-top: 5px;
+            animation: none;
+        }
+
+        .energy-ready {
+            animation: blink-text 0.5s infinite !important;
+            color: #fff !important;
+        }
+
+        @keyframes blink-text {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        #level-container {
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+
+        .hud div {
+            margin-bottom: 12px;
+        }
 
         #boss-life-container {
             display: none;
@@ -223,13 +372,19 @@
             box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
         }
 
-        #boss-life-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #f00, #f0f); transition: width 0.2s, background 0.3s; }
+        #boss-life-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #f00, #f0f);
+            transition: width 0.2s, background 0.3s;
+        }
 
         /* Popups */
         .popup {
             display: none;
             position: fixed;
-            top: 50%; left: 50%;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(10, 10, 20, 0.95);
             border: 4px solid #fff;
@@ -240,7 +395,12 @@
             border-radius: 10px;
         }
 
-        .popup p { font-size: 24px; margin-bottom: 30px; line-height: 1.5; text-shadow: 2px 2px 0 #f0f; }
+        .popup p {
+            font-size: 24px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            text-shadow: 2px 2px 0 #f0f;
+        }
 
         .popup button {
             background: transparent;
@@ -255,65 +415,197 @@
             border-radius: 5px;
         }
 
-        .popup button:hover { background: #fff; color: #000; transform: scale(1.05); box-shadow: 0 0 15px #fff; }
+        .popup button:hover {
+            background: #fff;
+            color: #000;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #fff;
+        }
 
-        #shop-popup { width: 600px; max-width: 90vw; }
-        #shop-popup h2 { color: #ffdf00; margin-top: 0; text-shadow: 2px 2px 0 #000; }
+        #shop-popup {
+            width: 600px;
+            max-width: 90vw;
+        }
+
+        #shop-popup h2 {
+            color: #ffdf00;
+            margin-top: 0;
+            text-shadow: 2px 2px 0 #000;
+        }
+
         .shop-item {
-            display: flex; justify-content: space-between; align-items: center;
-            border: 2px solid #555; padding: 15px; margin-bottom: 15px;
-            background: rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid #555;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 5px;
         }
-        .shop-item span { font-size: 14px; }
-        .shop-item button { margin: 0; padding: 10px 15px; font-size: 12px; }
-        .shop-item button:disabled { border-color: #555; color: #555; box-shadow: none; cursor: not-allowed; transform: none; background: transparent; }
+
+        .shop-item span {
+            font-size: 14px;
+        }
+
+        .shop-item button {
+            margin: 0;
+            padding: 10px 15px;
+            font-size: 12px;
+        }
+
+        .shop-item button:disabled {
+            border-color: #555;
+            color: #555;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+            background: transparent;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            font-size: 13px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .leaderboard-entry.current {
+            background: rgba(0, 255, 255, 0.15);
+            border: 1px solid #0ff;
+            color: #0ff;
+            font-weight: bold;
+        }
+
+        .leaderboard-entry span:first-child {
+            color: #aaa;
+            margin-right: 10px;
+        }
+
+        .leaderboard-entry.current span:first-child {
+            color: #0ff;
+        }
 
         #level-transition {
-            background: transparent; border: none; box-shadow: none; pointer-events: none;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            pointer-events: none;
             animation: pulse-level 1s infinite alternate;
         }
 
-        .upgrade-bars { display: flex; gap: 4px; margin-top: 5px; }
-        .bar-segment { width: 12px; height: 6px; background-color: #333; border: 1px solid #555; border-radius: 2px; transition: 0.2s; }
-        .bar-segment.active { background-color: #0ff; border-color: #fff; box-shadow: 0 0 5px #0ff; }
-        #level-transition p { font-size: 48px; color: #ff0; text-shadow: 0 0 20px #ff0, 0 0 40px #f00; margin: 0; }
-        @keyframes pulse-level { from { transform: translate(-50%, -50%) scale(1); } to { transform: translate(-50%, -50%) scale(1.1); } }
+        .upgrade-bars {
+            display: flex;
+            gap: 4px;
+            margin-top: 5px;
+        }
+
+        .bar-segment {
+            width: 12px;
+            height: 6px;
+            background-color: #333;
+            border: 1px solid #555;
+            border-radius: 2px;
+            transition: 0.2s;
+        }
+
+        .bar-segment.active {
+            background-color: #0ff;
+            border-color: #fff;
+            box-shadow: 0 0 5px #0ff;
+        }
+
+        #level-transition p {
+            font-size: 48px;
+            color: #ff0;
+            text-shadow: 0 0 20px #ff0, 0 0 40px #f00;
+            margin: 0;
+        }
+
+        @keyframes pulse-level {
+            from {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            to {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
 
         #overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); z-index: 999;
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
         }
-        
+
         .particle {
             position: absolute;
             background-color: #ff0;
-            width: 6px; height: 6px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             pointer-events: none;
             z-index: 7;
             box-shadow: 0 0 10px currentColor;
         }
+
         #inventory-container {
-            position: absolute; bottom: 20px; left: 20px;
-            display: flex; gap: 15px; z-index: 100;
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
             transition: opacity 0.2s;
         }
+
         .inv-slot {
-            background: rgba(0, 0, 0, 0.7); border: 2px solid #555;
-            padding: 10px; border-radius: 8px; text-align: center; position: relative;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #555;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            position: relative;
             transition: 0.2s;
         }
-        .inv-slot.has-item { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
-        .inv-key {
-            position: absolute; top: -10px; left: -10px;
-            background: #fff; color: #000; padding: 2px 5px;
-            border-radius: 3px; font-size: 10px;
+
+        .inv-slot.has-item {
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
-        .inv-icon { font-size: 20px; margin-bottom: 5px; }
-        .inv-count { font-size: 12px; color: #ffdf00; }
+
+        .inv-key {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background: #fff;
+            color: #000;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+
+        .inv-icon {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .inv-count {
+            font-size: 12px;
+            color: #ffdf00;
+        }
     </style>
 </head>
+
 <body>
     <div id="game-container">
         <div id="spaceship">
@@ -342,10 +634,12 @@
         <div class="hud" id="timer-container">
             <div id="timer">TIME: 0s</div>
         </div>
-        
+
         <div class="hud" id="energy-container">
             <div style="color: #0ff;">ENERGY</div>
-            <div id="energy-bar-wrap"><div id="energy-fill"></div></div>
+            <div id="energy-bar-wrap">
+                <div id="energy-fill"></div>
+            </div>
             <div id="energy-text">PRESS SHIFT</div>
         </div>
 
@@ -357,15 +651,31 @@
         </div>
 
         <div id="inventory-container">
-            <div class="inv-slot" id="slot-shield"><div class="inv-key">1</div><div class="inv-icon">🛡️</div><div class="inv-count" id="inv-shield">x0</div></div>
-            <div class="inv-slot" id="slot-damage"><div class="inv-key">2</div><div class="inv-icon">💥</div><div class="inv-count" id="inv-damage">x0</div></div>
-            <div class="inv-slot" id="slot-firerate"><div class="inv-key">3</div><div class="inv-icon">⚡</div><div class="inv-count" id="inv-firerate">x0</div></div>
-            <div class="inv-slot" id="slot-homing"><div class="inv-key">4</div><div class="inv-icon">🎯</div><div class="inv-count" id="inv-homing">x0</div></div>
+            <div class="inv-slot" id="slot-shield">
+                <div class="inv-key">1</div>
+                <div class="inv-icon">🛡️</div>
+                <div class="inv-count" id="inv-shield">x0</div>
+            </div>
+            <div class="inv-slot" id="slot-damage">
+                <div class="inv-key">2</div>
+                <div class="inv-icon">💥</div>
+                <div class="inv-count" id="inv-damage">x0</div>
+            </div>
+            <div class="inv-slot" id="slot-firerate">
+                <div class="inv-key">3</div>
+                <div class="inv-icon">⚡</div>
+                <div class="inv-count" id="inv-firerate">x0</div>
+            </div>
+            <div class="inv-slot" id="slot-homing">
+                <div class="inv-key">4</div>
+                <div class="inv-icon">🎯</div>
+                <div class="inv-count" id="inv-homing">x0</div>
+            </div>
         </div>
     </div>
 
     <div id="overlay"></div>
-    
+
     <div id="pause-popup" class="popup">
         <p>GAME PAUSED</p>
         <button id="resume-button">RESUME</button>
@@ -373,76 +683,120 @@
         <button id="restart-button">RESTART</button>
     </div>
 
-    <div id="shop-popup" class="popup" style="width: 800px; max-width: 95vw; max-height: 95vh; overflow-y: auto; padding: 20px; box-sizing: border-box;">
+    <div id="shop-popup" class="popup"
+        style="width: 800px; max-width: 95vw; max-height: 95vh; overflow-y: auto; padding: 20px; box-sizing: border-box;">
         <h2>SHOP</h2>
         <p id="shop-coins-display" style="font-size: 18px; color: #ffdf00;">💰 0</p>
-        
+
         <h3 style="color: #0ff; margin-bottom: 10px; text-shadow: 1px 1px 0 #000; font-size: 16px;">UPGRADES</h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
                     <span>MAX LIVES +1</span>
-                    <div class="upgrade-bars" id="bars-lives"><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                    <div class="upgrade-bars" id="bars-lives">
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                    </div>
                 </div>
                 <button id="btn-buy-lives" onclick="buyUpgrade('lives', 50)">50 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
                     <span>BASE FIRE RATE +</span>
-                    <div class="upgrade-bars" id="bars-fireRate"><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                    <div class="upgrade-bars" id="bars-fireRate">
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                    </div>
                 </div>
                 <button id="btn-buy-fireRate" onclick="buyUpgrade('fireRate', 30)">30 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
                     <span>BASE DAMAGE +</span>
-                    <div class="upgrade-bars" id="bars-weapon"><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                    <div class="upgrade-bars" id="bars-weapon">
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                    </div>
                 </div>
                 <button id="btn-buy-weapon" onclick="buyUpgrade('weapon', 100)">100 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
                     <span>SHIP SPEED +</span>
-                    <div class="upgrade-bars" id="bars-speed"><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                    <div class="upgrade-bars" id="bars-speed">
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                    </div>
                 </div>
                 <button id="btn-buy-speed" onclick="buyUpgrade('speed', 40)">40 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
                     <span>ENERGY CHARGE +</span>
-                    <div class="upgrade-bars" id="bars-energy"><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                    <div class="upgrade-bars" id="bars-energy">
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                    </div>
                 </div>
                 <button id="btn-buy-energy" onclick="buyUpgrade('energy', 60)">60 💰</button>
             </div>
         </div>
 
-        <h3 style="color: #0ff; margin-top: 25px; margin-bottom: 10px; text-shadow: 1px 1px 0 #000; font-size: 16px;">CONSUMABLES</h3>
+        <h3 style="color: #0ff; margin-top: 25px; margin-bottom: 10px; text-shadow: 1px 1px 0 #000; font-size: 16px;">
+            CONSUMABLES</h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
                     <span>🛡️ SHIELD</span>
-                    <div class="upgrade-bars" id="bars-inv-shield"><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                    <div class="upgrade-bars" id="bars-inv-shield">
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                    </div>
                 </div>
                 <button id="btn-buy-shield" onclick="buyConsumable('shield', 20)">20 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
                     <span>💥 DMG x2</span>
-                    <div class="upgrade-bars" id="bars-inv-damage"><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                    <div class="upgrade-bars" id="bars-inv-damage">
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                    </div>
                 </div>
                 <button id="btn-buy-damage" onclick="buyConsumable('damage', 25)">25 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
                     <span>⚡ FIRE RATE</span>
-                    <div class="upgrade-bars" id="bars-inv-firerate"><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                    <div class="upgrade-bars" id="bars-inv-firerate">
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                    </div>
                 </div>
                 <button id="btn-buy-firerate" onclick="buyConsumable('firerate', 25)">25 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
                     <span>🎯 HOMING</span>
-                    <div class="upgrade-bars" id="bars-inv-homing"><div class="bar-segment"></div><div class="bar-segment"></div></div>
+                    <div class="upgrade-bars" id="bars-inv-homing">
+                        <div class="bar-segment"></div>
+                        <div class="bar-segment"></div>
+                    </div>
                 </div>
                 <button id="btn-buy-homing" onclick="buyConsumable('homing', 30)">30 💰</button>
             </div>
@@ -451,10 +805,35 @@
         <button id="shop-close-btn" onclick="closeShop()" style="margin-top: 20px;">BACK TO PAUSE</button>
     </div>
 
-    <div id="end-popup" class="popup">
-        <p id="end-message"></p>
-        <p id="end-score" style="font-size: 18px; color: #0ff; margin-bottom: 30px;"></p>
-        <button id="revive-button" style="color: #ffdf00; border-color: #ffdf00; display: none;">REVIVE (100 💰)</button>
+    <div id="end-popup" class="popup" style="padding: 30px; width: 450px;">
+        <p id="end-message" style="font-size: 32px; margin-bottom: 5px;"></p>
+        <p id="end-score" style="font-size: 20px; color: #0ff; margin-bottom: 5px;"></p>
+
+        <div id="nickname-section" style="margin-bottom: 20px;">
+            <p style="font-size: 12px; color: #aaa; margin-bottom: 8px;">ENTER YOUR NICKNAME TO SAVE YOUR SCORE</p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <input type="text" id="player-nickname" placeholder="PILOT" maxlength="12"
+                    style="background: rgba(255,255,255,0.1); border: 2px solid #0ff; color: #fff; padding: 8px 12px; border-radius: 5px; font-family: 'Courier New', Courier, monospace; text-align: center; width: 150px; outline: none;">
+                <button id="btn-submit-score"
+                    style="margin: 0; padding: 8px 15px; font-size: 12px; background: #0ff; color: #000; font-weight: bold; border-radius: 5px;">VALIDATE</button>
+            </div>
+        </div>
+
+        <p id="run-rank" style="font-size: 14px; color: #ffdf00; margin-bottom: 15px; font-weight: bold;"></p>
+
+        <div id="leaderboard-box"
+            style="background: rgba(0,0,0,0.4); border: 1px solid #444; border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: left;">
+            <div
+                style="display: flex; justify-content: space-between; border-bottom: 1px solid #555; padding-bottom: 8px; margin-bottom: 10px;">
+                <span style="color: #ffdf00; font-size: 12px; font-weight: bold; letter-spacing: 1px;">GLOBAL
+                    LEADERBOARD (TOP 5)</span>
+                <span id="sync-status" style="color: #666; font-size: 10px;">LOCAL MODE</span>
+            </div>
+            <div id="leaderboard-list"></div>
+        </div>
+
+        <button id="revive-button" style="color: #ffdf00; border-color: #ffdf00; display: none;">REVIVE (100
+            💰)</button>
         <button id="newgame-button">PLAY AGAIN</button>
     </div>
 
@@ -462,7 +841,31 @@
         <p id="level-text">LEVEL 1</p>
     </div>
 
+    <!-- Firebase SDK (Compat version for easier single-file use) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <script>
+        // --- CONFIGURATION FIREBASE ---
+        // REMPLACE CETTE CONFIG PAR LA TIENNE DEPUIS LA CONSOLE FIREBASE !
+        const firebaseConfig = {
+            apiKey: "AIzaSyA96Ij3F3RoNY7xcaEfB6YRvCuwF5XH_hM",
+            authDomain: "mini-jeu-b1f36.firebaseapp.com",
+            projectId: "mini-jeu-b1f36",
+            storageBucket: "mini-jeu-b1f36.firebasestorage.app",
+            messagingSenderId: "187643808763",
+            appId: "1:187643808763:web:33a5732ee924a5f25b195e",
+            measurementId: "G-43SWG3T5CL"
+        };
+
+        // Initialisation optionnelle (ne plante pas si pas configuré)
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+        } catch (e) {
+            console.warn("Firebase non configuré. Utilisation du mode local.");
+        }
         // Game State
         const state = {
             level: 1,
@@ -498,10 +901,10 @@
         const timerEl = document.getElementById('timer');
         const energyFill = document.getElementById('energy-fill');
         const energyText = document.getElementById('energy-text');
-        
+
         const bossLifeContainer = document.getElementById('boss-life-container');
         const bossLifeFill = document.getElementById('boss-life-fill');
-        
+
         const overlay = document.getElementById('overlay');
         const pausePopup = document.getElementById('pause-popup');
         const shopPopup = document.getElementById('shop-popup');
@@ -520,10 +923,10 @@
         let upgrades = { lives: 0, fireRate: 0, speed: 0, energy: 0, weapon: 0 };
         let inventory = { shield: 0, damage: 0, firerate: 0, homing: 0 };
 
-        let player = { 
-            x: window.innerWidth / 2, 
-            y: window.innerHeight - 50, 
-            speed: 425 + (upgrades.speed * 42.5), 
+        let player = {
+            x: window.innerWidth / 2,
+            y: window.innerHeight - 50,
+            speed: 425 + (upgrades.speed * 42.5),
             cooldown: 0,
             maxLives: 3 + upgrades.lives,
             lives: 3 + upgrades.lives,
@@ -536,14 +939,14 @@
             isFiringBeam: false,
             beamTimer: 0
         };
-        
+
         let enemies = [];
         let lasers = []; // Player lasers
         let enemyLasers = [];
         let particles = [];
         let powerups = [];
         let boss = null;
-        
+
         let enemySpawnTimer = 0;
         let nextSpawnInterval = 1500;
         let powerupTimer = 0;
@@ -554,8 +957,8 @@
         // HUD Updates
         function updateLivesHud() {
             let hearts = '';
-            for(let i=0; i<player.lives; i++) hearts += '♥';
-            for(let i=player.lives; i<player.maxLives; i++) hearts += '♡';
+            for (let i = 0; i < player.lives; i++) hearts += '♥';
+            for (let i = player.lives; i < player.maxLives; i++) hearts += '♡';
             livesHudEl.textContent = hearts;
         }
         function updateCoinsHud() {
@@ -579,7 +982,7 @@
         // Damage Player
         function hitPlayer() {
             if (player.invulnerable > 0) return false;
-            
+
             if (player.hasShield) {
                 player.hasShield = false;
                 shieldBubble.style.display = 'none';
@@ -591,12 +994,12 @@
             player.lives--;
             updateLivesHud();
             createExplosion(player.x, player.y, '#f00');
-            
+
             if (player.lives <= 0) {
                 spaceship.style.display = 'none';
                 endGame(false);
             } else {
-                player.invulnerable = 2.0; 
+                player.invulnerable = 2.0;
             }
             return true;
         }
@@ -640,7 +1043,7 @@
         function togglePause() {
             if (state.isGameOver || state.transitioning) return;
             if (state.inShop) { closeShop(); return; }
-            
+
             state.isPaused = !state.isPaused;
             overlay.style.display = state.isPaused ? 'block' : 'none';
             pausePopup.style.display = state.isPaused ? 'block' : 'none';
@@ -653,7 +1056,7 @@
         document.getElementById('resume-button').addEventListener('click', togglePause);
         document.getElementById('restart-button').addEventListener('click', () => location.reload());
         document.getElementById('newgame-button').addEventListener('click', () => location.reload());
-        
+
         document.getElementById('shop-button').addEventListener('click', () => {
             pausePopup.style.display = 'none';
             shopPopup.style.display = 'block';
@@ -679,7 +1082,7 @@
             const container = document.getElementById('bars-' + type);
             if (!container) return;
             const segments = container.getElementsByClassName('bar-segment');
-            for(let i=0; i<segments.length; i++) {
+            for (let i = 0; i < segments.length; i++) {
                 if (i < level) segments[i].classList.add('active');
                 else segments[i].classList.remove('active');
             }
@@ -687,13 +1090,13 @@
 
         function updateShopUI() {
             shopCoinsDisplay.textContent = '💰 ' + state.coins;
-            
+
             updateBars('lives', upgrades.lives);
             updateBars('fireRate', upgrades.fireRate || 0);
             updateBars('weapon', upgrades.weapon);
             updateBars('speed', upgrades.speed);
             updateBars('energy', upgrades.energy);
-            
+
             const costLives = 50 + upgrades.lives * 50;
             const btnLives = document.getElementById('btn-buy-lives');
             btnLives.textContent = upgrades.lives >= 5 ? 'MAX' : costLives + ' 💰';
@@ -732,7 +1135,7 @@
             });
         }
 
-        window.buyConsumable = function(type, cost) {
+        window.buyConsumable = function (type, cost) {
             if (state.coins >= cost && inventory[type] < 2) {
                 state.coins -= cost;
                 inventory[type]++;
@@ -742,7 +1145,7 @@
             }
         }
 
-        window.buyUpgrade = function(type, baseCost) {
+        window.buyUpgrade = function (type, baseCost) {
             let cost = 0;
             if (type === 'lives') cost = 50 + upgrades.lives * 50;
             if (type === 'fireRate') cost = 30 + (upgrades.fireRate || 0) * 20;
@@ -770,7 +1173,7 @@
             levelText.textContent = 'LEVEL ' + state.level;
             levelTransitionPopup.style.display = 'block';
             overlay.style.display = 'block';
-            
+
             // Clear entities
             enemyLasers.forEach(l => l.el.remove()); enemyLasers = [];
             lasers.forEach(l => l.el.remove()); lasers = [];
@@ -792,9 +1195,9 @@
                 state.transitioning = false;
                 state.enemiesKilledThisLevel = 0;
                 levelHudEl.textContent = 'LEVEL ' + state.level;
-                
-                for(let i=0; i<3; i++) spawnEnemy();
-                
+
+                for (let i = 0; i < 3; i++) spawnEnemy();
+
                 state.lastFrameTime = performance.now();
                 if (!state.isPaused) requestAnimationFrame(gameLoop);
             }, 2500);
@@ -803,7 +1206,7 @@
         // Spawning Logic
         function spawnEnemy() {
             if (state.bossActive || state.transitioning) return;
-            
+
             const el = document.createElement('div');
             const img = document.createElement('img');
             img.src = 'Image/modele-autocollant-objet-volant-non-identifie-ovni-isole_1308-57963-removebg-preview.png';
@@ -812,7 +1215,7 @@
 
             const x = 50 + Math.random() * (window.innerWidth - 100);
             let r = Math.random(); let type = 1;
-            
+
             if (state.level === 2 && r > 0.7) type = 2;
             else if (state.level === 3) type = r > 0.8 ? 3 : (r > 0.5 ? 2 : 1);
             else if (state.level >= 4) type = r > 0.8 ? 4 : (r > 0.6 ? 3 : (r > 0.4 ? 2 : 1));
@@ -822,9 +1225,9 @@
             el.className = 'enemy enemy-type-' + type;
             const baseSpeed = 85 + Math.random() * 42.5;
 
-            if (type === 1) { enemy.speed = baseSpeed * (1 + (state.level - 1) * 0.15); enemy.hp = 1; } 
-            else if (type === 2) { enemy.speed = baseSpeed * 0.8 * (1 + (state.level - 1) * 0.1); enemy.hp = 1; enemy.shootTimer = 0; enemy.nextShoot = 1.725 + Math.random() * 2.3; } 
-            else if (type === 3) { enemy.speed = baseSpeed * 0.7 * (1 + (state.level - 1) * 0.1); enemy.hp = 2; enemy.waveTime = Math.random() * 10; enemy.dirX = Math.random() > 0.5 ? 1 : -1; } 
+            if (type === 1) { enemy.speed = baseSpeed * (1 + (state.level - 1) * 0.15); enemy.hp = 1; }
+            else if (type === 2) { enemy.speed = baseSpeed * 0.8 * (1 + (state.level - 1) * 0.1); enemy.hp = 1; enemy.shootTimer = 0; enemy.nextShoot = 1.725 + Math.random() * 2.3; }
+            else if (type === 3) { enemy.speed = baseSpeed * 0.7 * (1 + (state.level - 1) * 0.1); enemy.hp = 2; enemy.waveTime = Math.random() * 10; enemy.dirX = Math.random() > 0.5 ? 1 : -1; }
             else if (type === 4) { enemy.speed = baseSpeed * 0.4 * (1 + (state.level - 1) * 0.05); enemy.hp = 4; enemy.width = 55; enemy.height = 55; }
 
             enemy.maxHp = enemy.hp;
@@ -838,7 +1241,7 @@
         }
 
         const powerupTypes = ['health'];
-        const powerupIcons = { 'health':'♥' };
+        const powerupIcons = { 'health': '♥' };
 
         function spawnPowerup() {
             if (state.transitioning || player.lives >= player.maxLives) return;
@@ -869,9 +1272,9 @@
             img.style.filter = `hue-rotate(${((state.level - 1) * 75) % 360}deg)`;
             el.appendChild(img); container.appendChild(el);
 
-            boss = { 
-                el, x: window.innerWidth / 2, y: 100, 
-                speedX: 170 + (state.level - 1) * 25.5, 
+            boss = {
+                el, x: window.innerWidth / 2, y: 100,
+                speedX: 170 + (state.level - 1) * 25.5,
                 direction: 1, shootTimer: 0,
                 phase: 1
             };
@@ -880,7 +1283,7 @@
 
         // Weapon Logic
         function getWeaponConfig(level) {
-            switch(level) {
+            switch (level) {
                 case 1: return { dmg: 1, color: '#0ff', angles: [0] };
                 case 2: return { dmg: 2, color: '#0f0', angles: [0] };
                 case 3: return { dmg: 3, color: '#ff0', angles: [0] };
@@ -893,7 +1296,7 @@
 
         function shootLaser() {
             if (state.isPaused || state.isGameOver || state.transitioning || player.cooldown > 0 || player.isFiringBeam) return;
-            
+
             const config = getWeaponConfig(player.weaponLevel);
             let finalDmg = config.dmg * (player.dmgBoostTimer > 0 ? 2 : 1);
 
@@ -902,10 +1305,10 @@
                 el.className = 'laser';
                 el.style.backgroundColor = player.dmgBoostTimer > 0 ? '#f00' : config.color;
                 el.style.boxShadow = `0 0 10px ${el.style.backgroundColor}, 0 0 20px ${el.style.backgroundColor}`;
-                
+
                 if (angle !== 0) el.style.transform = `translateX(-50%) rotate(${angle}deg)`;
                 container.appendChild(el);
-                
+
                 const rad = angle * Math.PI / 180;
                 const speed = 850;
                 const vx = Math.sin(rad) * speed;
@@ -942,10 +1345,10 @@
 
             if (actualPhase === 1) {
                 const el = document.createElement('div'); el.className = 'big-enemy-laser'; container.appendChild(el);
-                enemyLasers.push({ 
-                    el, x: boss.x, y: boss.y + 50, speed: laserSpeed, 
-                    w: 6, h: 35, vx: 0, vy: laserSpeed, 
-                    isHoming: state.level >= 3 
+                enemyLasers.push({
+                    el, x: boss.x, y: boss.y + 50, speed: laserSpeed,
+                    w: 6, h: 35, vx: 0, vy: laserSpeed,
+                    isHoming: state.level >= 3
                 });
             } else if (actualPhase === 2) {
                 const el1 = document.createElement('div'); el1.className = 'big-enemy-laser'; container.appendChild(el1);
@@ -1003,14 +1406,99 @@
 
         reviveBtn.addEventListener('click', revivePlayer);
 
+        function updateLeaderboardUI(leaderboard, currentRunId = null) {
+            const listEl = document.getElementById('leaderboard-list');
+            listEl.innerHTML = '';
+
+            leaderboard.slice(0, 5).forEach((entry, i) => {
+                const isCurrent = entry.id === currentRunId;
+                const div = document.createElement('div');
+                div.className = 'leaderboard-entry' + (isCurrent ? ' current' : '');
+                div.innerHTML = `<span>#${i + 1} ${entry.name}</span><span>${entry.score.toLocaleString()}</span>`;
+                listEl.appendChild(div);
+            });
+        }
+
+        async function updateLeaderboard(currentScore) {
+            const syncStatus = document.getElementById('sync-status');
+            const nicknameInput = document.getElementById('player-nickname');
+            const submitBtn = document.getElementById('btn-submit-score');
+            const nicknameSection = document.getElementById('nickname-section');
+
+            // Pré-remplir avec le dernier pseudo utilisé
+            nicknameInput.value = localStorage.getItem('spaceInvadersNickname') || "";
+
+            let currentRunId = Date.now().toString();
+            let leaderboard = [];
+
+            // 1. Charger les scores (Firebase ou Local)
+            if (db) {
+                syncStatus.textContent = "SYNCING...";
+                try {
+                    const snapshot = await db.ref('scores').orderByChild('score').limitToLast(50).once('value');
+                    const data = snapshot.val();
+                    if (data) {
+                        leaderboard = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                    }
+                    syncStatus.textContent = "GLOBAL ONLINE";
+                } catch (e) {
+                    console.error("Firebase Read Error:", e);
+                    syncStatus.textContent = "OFFLINE MODE";
+                }
+            }
+
+            // Fallback local si Firebase vide ou échoue
+            if (leaderboard.length === 0) {
+                leaderboard = JSON.parse(localStorage.getItem('spaceInvadersLeaderboard')) || [
+                    { id: '1', name: "X-WING", score: 50000 },
+                    { id: '2', name: "SKYWALKER", score: 35000 },
+                    { id: '3', name: "BOUNTY", score: 22000 },
+                    { id: '4', name: "DROID", score: 15000 },
+                    { id: '5', name: "REBEL", score: 8000 }
+                ];
+            }
+
+            leaderboard.sort((a, b) => b.score - a.score);
+            updateLeaderboardUI(leaderboard);
+
+            // Gestion du bouton Valider
+            submitBtn.onclick = async () => {
+                const name = nicknameInput.value.trim().toUpperCase() || "PILOT";
+                localStorage.setItem('spaceInvadersNickname', name);
+                nicknameSection.style.display = 'none';
+
+                if (db) {
+                    const newRef = db.ref('scores').push();
+                    await newRef.set({ name: name, score: currentScore, date: Date.now() });
+                    currentRunId = newRef.key;
+                    // Recharger après envoi
+                    const snapshot = await db.ref('scores').orderByChild('score').limitToLast(50).once('value');
+                    const data = snapshot.val();
+                    leaderboard = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                } else {
+                    leaderboard.push({ id: currentRunId, name: name, score: currentScore });
+                    const saveList = leaderboard.map(e => ({ name: e.name, score: e.score })).slice(0, 50);
+                    localStorage.setItem('spaceInvadersLeaderboard', JSON.stringify(saveList));
+                }
+
+                leaderboard.sort((a, b) => b.score - a.score);
+                const rank = leaderboard.findIndex(e => e.id === currentRunId) + 1;
+                document.getElementById('run-rank').textContent = `YOUR WORLD RANK: #${rank}`;
+                updateLeaderboardUI(leaderboard, currentRunId);
+            };
+        }
+
         function endGame(win) {
             state.isGameOver = true;
             overlay.style.display = 'block'; endPopup.style.display = 'block';
             endMessage.textContent = win ? 'MISSION ACCOMPLISHED!' : 'GAME OVER';
             endMessage.style.color = win ? '#0f0' : '#f00';
             endScore.textContent = 'FINAL SCORE: ' + state.score;
-            
-            // Show revive button if not win and has enough coins
+
+            document.getElementById('nickname-section').style.display = 'block';
+            document.getElementById('run-rank').textContent = "";
+            updateLeaderboard(state.score);
+
             if (!win && state.coins >= 100) {
                 reviveBtn.style.display = 'inline-block';
             } else {
@@ -1024,13 +1512,13 @@
         }
 
         function checkCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
-            return (x1 - w1/2 < x2 + w2/2 && x1 + w1/2 > x2 - w2/2 && y1 - h1/2 < y2 + h2/2 && y1 + h1/2 > y2 - h2/2);
+            return (x1 - w1 / 2 < x2 + w2 / 2 && x1 + w1 / 2 > x2 - w2 / 2 && y1 - h1 / 2 < y2 + h2 / 2 && y1 + h1 / 2 > y2 - h2 / 2);
         }
 
         // Main Loop
         function gameLoop(timestamp) {
             if (state.isPaused || state.isGameOver) return;
-            
+
             if (!state.lastFrameTime) state.lastFrameTime = timestamp;
             const dt = Math.min((timestamp - state.lastFrameTime) / 1000, 0.1);
             state.lastFrameTime = timestamp;
@@ -1048,8 +1536,8 @@
 
             // Timer & Energy UI
             state.gameTimeMs += dt;
-            if (Math.floor(state.gameTimeMs) > state.time) { 
-                state.time = Math.floor(state.gameTimeMs); 
+            if (Math.floor(state.gameTimeMs) > state.time) {
+                state.time = Math.floor(state.gameTimeMs);
                 if (state.time >= 60) {
                     let m = Math.floor(state.time / 60);
                     let s = state.time % 60;
@@ -1058,7 +1546,7 @@
                     timerEl.textContent = 'TIME: ' + state.time + 's';
                 }
             }
-            
+
             // Passive energy gen (increased by upgrade)
             if (!player.isFiringBeam && state.energy < 100) {
                 state.energy += (1.4 + upgrades.energy * 0.7) * dt;
@@ -1090,8 +1578,8 @@
                     });
                     if (state.bossActive && boss && boss.x > player.x - 60 && boss.x < player.x + 60 && boss.y < player.y) {
                         state.bossLife -= 21 * dt; updateBossLife();
-                        boss.el.style.filter = `hue-rotate(${((state.level-1)*75)%360}deg) brightness(2)`;
-                        setTimeout(() => { if(boss && boss.el) boss.el.style.filter = `hue-rotate(${((state.level-1)*75)%360}deg)`; }, 100);
+                        boss.el.style.filter = `hue-rotate(${((state.level - 1) * 75) % 360}deg) brightness(2)`;
+                        setTimeout(() => { if (boss && boss.el) boss.el.style.filter = `hue-rotate(${((state.level - 1) * 75) % 360}deg)`; }, 100);
                         if (state.bossLife <= 0) killBoss();
                     }
                 }
@@ -1117,7 +1605,7 @@
             player.x = Math.max(30, Math.min(window.innerWidth - 30, player.x));
             spaceship.style.left = player.x + 'px';
             if (player.cooldown > 0) player.cooldown -= dt;
-            
+
             const invContainer = document.getElementById('inventory-container');
             if (player.x < 300) invContainer.style.opacity = '0.5';
             else invContainer.style.opacity = '1';
@@ -1126,7 +1614,7 @@
             if (!state.bossActive) {
                 enemySpawnTimer += gameDt * 1000;
                 if (enemySpawnTimer > nextSpawnInterval) {
-                    spawnEnemy(); enemySpawnTimer = 0; nextSpawnInterval = Math.max(690, 1725 - (state.level * 172.5)); 
+                    spawnEnemy(); enemySpawnTimer = 0; nextSpawnInterval = Math.max(690, 1725 - (state.level * 172.5));
                 }
             }
             powerupTimer += gameDt * 1000;
@@ -1148,7 +1636,7 @@
                     else if (p.type === 'damage') player.dmgBoostTimer = 8.0;
                     else if (p.type === 'firerate') player.fireRateTimer = 8.0;
                     else if (p.type === 'homing') player.homingTimer = 10.0;
-                    
+
                     createExplosion(player.x, player.y, '#fff');
                     p.el.remove(); powerups.splice(i, 1); continue;
                 }
@@ -1181,7 +1669,7 @@
                 boss.x += boss.speedX * boss.direction * gameDt;
                 if (boss.x < 100 || boss.x > window.innerWidth - 100) { boss.direction *= -1; boss.x = Math.max(100, Math.min(window.innerWidth - 100, boss.x)); }
                 if (Math.random() < 0.015) boss.direction = Math.random() < 0.5 ? -1 : 1;
-                
+
                 boss.el.style.left = boss.x + 'px'; boss.el.style.top = boss.y + 'px';
 
                 boss.shootTimer += gameDt;
@@ -1189,36 +1677,36 @@
 
                 let attackLevel = state.level >= 10 ? Math.min(3, Math.ceil(state.level / 2)) : 1;
                 if (boss.shootTimer > shootInterval) { bossShoot(attackLevel); boss.shootTimer = 0; }
-                
+
                 if (checkCollision(player.x, player.y, 40, 40, boss.x, boss.y, 100, 100)) hitPlayer();
             }
 
             // Player Lasers (Homing, Bouncing, Collision)
             for (let i = lasers.length - 1; i >= 0; i--) {
                 let l = lasers[i];
-                
+
                 // Homing logic
                 if (player.homingTimer > 0) {
                     let closest = null; let minDist = Infinity;
-                    enemies.forEach(e => { let d = (e.x-l.x)**2 + (e.y-l.y)**2; if (d < minDist && e.y < l.y) { minDist = d; closest = e; } });
-                    if (state.bossActive && boss) { let d = (boss.x-l.x)**2 + (boss.y-l.y)**2; if (d < minDist && boss.y < l.y) { minDist = d; closest = boss; } }
-                    
+                    enemies.forEach(e => { let d = (e.x - l.x) ** 2 + (e.y - l.y) ** 2; if (d < minDist && e.y < l.y) { minDist = d; closest = e; } });
+                    if (state.bossActive && boss) { let d = (boss.x - l.x) ** 2 + (boss.y - l.y) ** 2; if (d < minDist && boss.y < l.y) { minDist = d; closest = boss; } }
+
                     if (closest) {
                         let dx = closest.x - l.x; let dy = closest.y - l.y;
-                        let dist = Math.sqrt(dx*dx + dy*dy);
-                        let speed = Math.sqrt(l.vx*l.vx + l.vy*l.vy);
+                        let dist = Math.sqrt(dx * dx + dy * dy);
+                        let speed = Math.sqrt(l.vx * l.vx + l.vy * l.vy);
                         let steer = 8 * dt; // Steer strength
-                        l.vx += ((dx/dist)*speed - l.vx) * steer;
-                        l.vy += (-(dy/dist)*speed - l.vy) * steer;
+                        l.vx += ((dx / dist) * speed - l.vx) * steer;
+                        l.vy += (-(dy / dist) * speed - l.vy) * steer;
 
                         // Clamp total angle to 35 degrees relative to straight up
                         let angleRad = Math.atan2(l.vx, l.vy);
                         const maxAngle = 35 * Math.PI / 180;
                         angleRad = Math.max(-maxAngle, Math.min(maxAngle, angleRad));
-                        
+
                         l.vx = Math.sin(angleRad) * speed;
                         l.vy = Math.cos(angleRad) * speed;
-                        
+
                         l.el.style.transform = `translateX(-50%) rotate(${angleRad * 180 / Math.PI}deg)`;
                     }
                 }
@@ -1235,7 +1723,7 @@
                 }
 
                 l.el.style.left = l.x + 'px'; l.el.style.top = l.y + 'px';
-                
+
                 let hit = false;
                 if (state.bossActive && boss && checkCollision(l.x, l.y, l.w, l.h, boss.x, boss.y, 120, 120)) {
                     state.bossLife -= l.dmg; updateBossLife(); createExplosion(l.x, l.y, '#fff');
@@ -1255,10 +1743,10 @@
                             e.el.remove(); enemies.splice(j, 1);
                             state.score += 10 * (e.type || 1); state.enemiesKilledThisLevel++;
                             scoreEl.textContent = 'SCORE: ' + state.score;
-                            
+
                             // Gain energy on kill
-                            if(!player.isFiringBeam) state.energy = Math.min(100, state.energy + 1);
-                            
+                            if (!player.isFiringBeam) state.energy = Math.min(100, state.energy + 1);
+
                             if (state.enemiesKilledThisLevel >= 20 && !state.bossActive) spawnBoss();
                         } else {
                             createExplosion(l.x, l.y, '#fff');
@@ -1269,24 +1757,24 @@
                         l.el.remove(); lasers.splice(i, 1); hit = true; break;
                     }
                 }
-                
+
                 if (!hit && l.y < -30) { l.el.remove(); lasers.splice(i, 1); }
             }
 
             // Enemy Lasers
             for (let i = enemyLasers.length - 1; i >= 0; i--) {
                 let l = enemyLasers[i];
-                
+
                 if (l.isHoming) {
                     let dx = player.x - l.x;
                     let dy = player.y - l.y;
-                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    let dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist > 0) {
-                        let speed = Math.sqrt(l.vx*l.vx + l.vy*l.vy);
+                        let speed = Math.sqrt(l.vx * l.vx + l.vy * l.vy);
                         let steer = 2.0 * gameDt;
-                        l.vx += ((dx/dist)*speed - l.vx) * steer;
-                        l.vy += ((dy/dist)*speed - l.vy) * steer;
-                        
+                        l.vx += ((dx / dist) * speed - l.vx) * steer;
+                        l.vy += ((dy / dist) * speed - l.vy) * steer;
+
                         let angle = Math.atan2(l.vx, l.vy);
                         const maxAngle = 35 * Math.PI / 180;
                         angle = Math.max(-maxAngle, Math.min(maxAngle, angle));
@@ -1301,9 +1789,9 @@
                 } else {
                     l.y += l.speed * gameDt;
                 }
-                
+
                 l.el.style.left = l.x + 'px'; l.el.style.top = l.y + 'px';
-                if (checkCollision(l.x, l.y, l.w, l.h, player.x, player.y, 40, 40)) { if (hitPlayer()) { l.el.remove(); enemyLasers.splice(i, 1); } } 
+                if (checkCollision(l.x, l.y, l.w, l.h, player.x, player.y, 40, 40)) { if (hitPlayer()) { l.el.remove(); enemyLasers.splice(i, 1); } }
                 else if (l.y > window.innerHeight + 30) { l.el.remove(); enemyLasers.splice(i, 1); }
             }
 
@@ -1316,7 +1804,7 @@
             state.coins += 50; updateCoinsHud();
             boss.el.remove(); boss = null; state.bossActive = false; bossLifeContainer.style.display = 'none';
             state.score += 1000 * state.level; scoreEl.textContent = 'SCORE: ' + state.score;
-            setTimeout(() => { 
+            setTimeout(() => {
                 state.isPaused = true;
                 state.inShop = true;
                 state.shopFromLevelEnd = true;
@@ -1330,7 +1818,7 @@
         function updateParticles(dt) {
             for (let i = particles.length - 1; i >= 0; i--) {
                 let p = particles[i]; p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt * 1.5;
-                if (p.life <= 0) { p.el.remove(); particles.splice(i, 1); } 
+                if (p.life <= 0) { p.el.remove(); particles.splice(i, 1); }
                 else { p.el.style.left = p.x + 'px'; p.el.style.top = p.y + 'px'; p.el.style.opacity = p.life; }
             }
         }
@@ -1340,4 +1828,5 @@
         startLevelTransition();
     </script>
 </body>
+
 </html>
