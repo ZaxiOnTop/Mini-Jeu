@@ -623,6 +623,7 @@
             state.inShop = false;
             if (state.shopFromLevelEnd) {
                 state.level++;
+                state.isPaused = false;
                 startLevelTransition();
             } else {
                 pausePopup.style.display = 'block';
@@ -844,7 +845,7 @@
                 lasers.push({ el, x: player.x, y: player.y - 40, vx: vx, vy: vy, dmg: finalDmg, w: 4, h: 25 });
             });
 
-            let baseCooldown = 0.17;
+            let baseCooldown = 0.34;
             if (player.fireRateTimer > 0) baseCooldown /= 2;
             player.cooldown = baseCooldown;
         }
