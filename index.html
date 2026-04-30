@@ -701,7 +701,7 @@
                         <div class="bar-segment"></div>
                     </div>
                 </div>
-                <button id="btn-buy-lives" onclick="buyUpgrade('lives', 50)">50 💰</button>
+                <button id="btn-buy-lives">50 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
@@ -714,7 +714,7 @@
                         <div class="bar-segment"></div>
                     </div>
                 </div>
-                <button id="btn-buy-fireRate" onclick="buyUpgrade('fireRate', 30)">30 💰</button>
+                <button id="btn-buy-fireRate">30 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
@@ -727,7 +727,7 @@
                         <div class="bar-segment"></div>
                     </div>
                 </div>
-                <button id="btn-buy-weapon" onclick="buyUpgrade('weapon', 100)">100 💰</button>
+                <button id="btn-buy-weapon">100 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
@@ -740,7 +740,7 @@
                         <div class="bar-segment"></div>
                     </div>
                 </div>
-                <button id="btn-buy-speed" onclick="buyUpgrade('speed', 40)">40 💰</button>
+                <button id="btn-buy-speed">40 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
@@ -753,7 +753,7 @@
                         <div class="bar-segment"></div>
                     </div>
                 </div>
-                <button id="btn-buy-energy" onclick="buyUpgrade('energy', 60)">60 💰</button>
+                <button id="btn-buy-energy">60 💰</button>
             </div>
         </div>
 
@@ -768,7 +768,7 @@
                         <div class="bar-segment"></div>
                     </div>
                 </div>
-                <button id="btn-buy-shield" onclick="buyConsumable('shield', 20)">20 💰</button>
+                <button id="btn-buy-shield">20 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
@@ -778,7 +778,7 @@
                         <div class="bar-segment"></div>
                     </div>
                 </div>
-                <button id="btn-buy-damage" onclick="buyConsumable('damage', 25)">25 💰</button>
+                <button id="btn-buy-damage">25 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
@@ -788,7 +788,7 @@
                         <div class="bar-segment"></div>
                     </div>
                 </div>
-                <button id="btn-buy-firerate" onclick="buyConsumable('firerate', 25)">25 💰</button>
+                <button id="btn-buy-firerate">25 💰</button>
             </div>
             <div class="shop-item" style="margin-bottom: 0;">
                 <div>
@@ -798,8 +798,9 @@
                         <div class="bar-segment"></div>
                     </div>
                 </div>
-                <button id="btn-buy-homing" onclick="buyConsumable('homing', 30)">30 💰</button>
+                <button id="btn-buy-homing">30 💰</button>
             </div>
+
         </div>
 
         <button id="shop-close-btn" onclick="closeShop()" style="margin-top: 20px;">BACK TO PAUSE</button>
@@ -894,14 +895,58 @@
             isPaused: false,
             isGameOver: false,
             energy: 0,
+            _coinsCheck: 0, // Signature des pièces
             keys: { ArrowLeft: false, ArrowRight: false, Space: false, Shift: false }
         };
+
+        state._coinsCheck = state.coins * 456 + 789;
 
         // Fonction sécurisée pour ajouter du score
         function addScore(points) {
             state.score += points;
-            state._scoreCheck = state.score * 123 + 456; // Formule de hash simple
+            state._scoreCheck = state.score * 123 + 456;
         }
+
+        // Fonction sécurisée pour les pièces
+        function addCoins(amount) {
+            state.coins += amount;
+            state._coinsCheck = state.coins * 456 + 789;
+            saveGameData();
+        }
+
+        function saveGameData() {
+            const data = {
+                coins: state.coins,
+                upgrades: upgrades,
+                bestScore: state.bestScore,
+                inventory: inventory
+            };
+            const json = JSON.stringify(data);
+            // On crée une signature simple pour empêcher l'édition manuelle du JSON
+            const signature = btoa(json).split('').reverse().join(''); 
+            localStorage.setItem('spaceInvadersSave', json);
+            localStorage.setItem('spaceInvadersSig', signature);
+        }
+
+        function loadGameData() {
+            const json = localStorage.getItem('spaceInvadersSave');
+            const sig = localStorage.getItem('spaceInvadersSig');
+            if (json && sig) {
+                const expectedSig = btoa(json).split('').reverse().join('');
+                if (sig === expectedSig) {
+                    const data = JSON.parse(json);
+                    state.coins = data.coins || 0;
+                    state._coinsCheck = state.coins * 456 + 789;
+                    state.bestScore = data.bestScore || 0;
+                    upgrades = data.upgrades || upgrades;
+                    inventory = data.inventory || inventory;
+                } else {
+                    console.warn("Save corruption detected (Anti-cheat). Resetting.");
+                }
+            }
+        }
+        loadGameData();
+
 
         // DOM Elements
         const container = document.getElementById('game-container');
@@ -1116,28 +1161,31 @@
             const btnLives = document.getElementById('btn-buy-lives');
             btnLives.textContent = upgrades.lives >= 5 ? 'MAX' : costLives + ' 💰';
             btnLives.disabled = upgrades.lives >= 5 || state.coins < costLives;
+            btnLives.onclick = () => buyUpgrade('lives', 50);
 
             const costFireRate = 30 + (upgrades.fireRate || 0) * 20;
             const btnFireRate = document.getElementById('btn-buy-fireRate');
             btnFireRate.textContent = (upgrades.fireRate || 0) >= 5 ? 'MAX' : costFireRate + ' 💰';
             btnFireRate.disabled = (upgrades.fireRate || 0) >= 5 || state.coins < costFireRate;
-
-
+            btnFireRate.onclick = () => buyUpgrade('fireRate', 30);
 
             const costSpeed = 40 + upgrades.speed * 30;
             const btnSpeed = document.getElementById('btn-buy-speed');
             btnSpeed.textContent = upgrades.speed >= 5 ? 'MAX' : costSpeed + ' 💰';
             btnSpeed.disabled = upgrades.speed >= 5 || state.coins < costSpeed;
+            btnSpeed.onclick = () => buyUpgrade('speed', 40);
 
             const costEnergy = 60 + upgrades.energy * 40;
             const btnEnergy = document.getElementById('btn-buy-energy');
             btnEnergy.textContent = upgrades.energy >= 5 ? 'MAX' : costEnergy + ' 💰';
             btnEnergy.disabled = upgrades.energy >= 5 || state.coins < costEnergy;
+            btnEnergy.onclick = () => buyUpgrade('energy', 60);
 
             const costWeapon = 100 + upgrades.weapon * 50;
             const btnWeapon = document.getElementById('btn-buy-weapon');
             btnWeapon.textContent = upgrades.weapon >= 5 ? 'MAX' : costWeapon + ' 💰';
             btnWeapon.disabled = upgrades.weapon >= 5 || state.coins < costWeapon;
+            btnWeapon.onclick = () => buyUpgrade('weapon', 100);
 
             ['shield', 'damage', 'firerate', 'homing'].forEach(type => {
                 updateBars('inv-' + type, inventory[type]);
@@ -1146,21 +1194,32 @@
                 if (btn) {
                     btn.textContent = inventory[type] >= 2 ? 'MAX' : cost + ' 💰';
                     btn.disabled = inventory[type] >= 2 || state.coins < cost;
+                    btn.onclick = () => buyConsumable(type, cost);
                 }
             });
         }
 
-        window.buyConsumable = function (type, cost) {
+        function buyConsumable(type, cost) {
+            // Vérification intégrité
+            if (state.coins * 456 + 789 !== state._coinsCheck) {
+                alert("CHEATER DETECTED: Coins reset.");
+                state.coins = 0; state._coinsCheck = 789; return;
+            }
+            
             if (state.coins >= cost && inventory[type] < 2) {
-                state.coins -= cost;
+                addCoins(-cost);
                 inventory[type]++;
-                updateCoinsHud();
                 updateShopUI();
                 updateInventoryHud();
             }
         }
 
-        window.buyUpgrade = function (type, baseCost) {
+        function buyUpgrade(type, baseCost) {
+            if (state.coins * 456 + 789 !== state._coinsCheck) {
+                alert("CHEATER DETECTED: Coins reset.");
+                state.coins = 0; state._coinsCheck = 789; return;
+            }
+
             let cost = 0;
             if (type === 'lives') cost = 50 + upgrades.lives * 50;
             if (type === 'fireRate') cost = 30 + (upgrades.fireRate || 0) * 20;
@@ -1757,7 +1816,7 @@
                         e.hp -= l.dmg;
                         if (e.hp <= 0) {
                             createExplosion(e.x, e.y, '#ff0');
-                            state.coins += (e.type || 1); updateCoinsHud();
+                            addCoins(e.type || 1);
                             e.el.remove(); enemies.splice(j, 1);
                             addScore(10 * (e.type || 1)); state.enemiesKilledThisLevel++;
                             scoreEl.textContent = 'SCORE: ' + state.score;
@@ -1819,7 +1878,7 @@
 
         function killBoss() {
             createExplosion(boss.x, boss.y, '#f0f'); createExplosion(boss.x + 40, boss.y - 20, '#f00'); createExplosion(boss.x - 40, boss.y + 20, '#ff0');
-            state.coins += 50; updateCoinsHud();
+            addCoins(50);
             boss.el.remove(); boss = null; state.bossActive = false; bossLifeContainer.style.display = 'none';
             addScore(1000 * state.level); scoreEl.textContent = 'SCORE: ' + state.score;
             setTimeout(() => {
