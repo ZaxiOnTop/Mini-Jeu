@@ -1356,8 +1356,8 @@
             TANK: { hp: 5, speed: 0.45, fireRate: 0.008, score: 60, filter: 'hue-rotate(300deg) saturate(2)', size: 60, coins: 5 }, 
             KAMIKAZE: { hp: 1, speed: 2.8, fireRate: 0, score: 30, filter: 'hue-rotate(45deg) saturate(3) contrast(1.5)', dash: true, coins: 3 },
             ASTEROID: { hp: 10, speed: 1.0, fireRate: 0, score: 5, filter: 'grayscale(1) brightness(0.7)', size: 80, isHazard: true, coins: 10 },
-            CARGO: { hp: 6, speed: 0.85, fireRate: 0, score: 100, filter: 'sepia(1) saturate(10) brightness(1.2)', horizontal: true, coins: 10, size: 150, img: 'Image/cargo.png' },
-            SUPER_CARGO: { hp: 8, speed: 1.1, fireRate: 0, score: 500, filter: 'brightness(3) saturate(0) contrast(2)', horizontal: true, coins: 50, size: 200, img: 'Image/cargo.png' }
+            CARGO: { hp: 6, speed: 0.425, fireRate: 0, score: 100, filter: 'sepia(1) saturate(10) brightness(1.2)', horizontal: true, coins: 10, size: 150, img: 'Image/cargo.png' },
+            SUPER_CARGO: { hp: 8, speed: 0.55, fireRate: 0, score: 500, filter: 'brightness(3) saturate(0) contrast(2)', horizontal: true, coins: 50, size: 200, img: 'Image/cargo.png' }
         };
 
         function spawnEnemy(typeKey = 'SCOUT', customX = null, customY = -60) {
